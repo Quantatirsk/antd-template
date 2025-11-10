@@ -73,16 +73,19 @@ export const semantic = {
 
 export const spacing = {
   0: '0',
-  1: '8px',    // 最小间距（iOS列表内元素）
-  2: '12px',   // 紧凑间距（标签、小按钮）
-  3: '16px',   // 标准间距（卡片内元素、表单间距）
-  4: '20px',   // 舒适间距（卡片padding）
-  5: '24px',   // 大间距（卡片之间、区块内部）
-  6: '32px',   // 区域间距（页面section之间）
-  8: '40px',   // 大区域间距（页面顶部、底部）
-  10: '48px',  // 超大区域间距（页面板块）
-  12: '64px',  // 页面级间距（hero区域）
-  16: '80px',  // 特大页面间距
+  0.25: '2px',   // 微小间距（标签内部、微调）
+  0.5: '4px',    // 极小间距（图标与文字、紧凑布局）
+  0.75: '6px',   // 小间距（卡片操作栏）
+  1: '8px',      // 最小间距（iOS列表内元素）
+  2: '12px',     // 紧凑间距（标签、小按钮）
+  3: '16px',     // 标准间距（卡片内元素、表单间距）
+  4: '20px',     // 舒适间距（卡片padding）
+  5: '24px',     // 大间距（卡片之间、区块内部）
+  6: '32px',     // 区域间距（页面section之间）
+  8: '40px',     // 大区域间距（页面顶部、底部）
+  10: '48px',    // 超大区域间距（页面板块）
+  12: '64px',    // 页面级间距（hero区域）
+  16: '80px',    // 特大页面间距
 } as const;
 
 // ==================== 高度系统（8px网格对齐）====================
@@ -189,6 +192,9 @@ export const shadows = {
 export const cardSystem = {
   // 卡片圆角（增大到10px）
   borderRadius: borderRadius.lg,  // 10px
+
+  // 卡片尺寸
+  minWidth: '300px',              // 卡片最小宽度（用于 grid 布局）
 
   // 卡片背景色
   background: colors.neutral[0],   // 纯白
@@ -298,6 +304,7 @@ export const componentFontSize = {
 export const breakpoints = {
   mobile: '640px',
   tablet: '768px',
+  threeColumn: '900px',  // ThreeColumnLayout 自动折叠断点
   laptop: '1024px',
   desktop: '1280px',
   wide: '1536px',
@@ -335,6 +342,115 @@ export const opacity = {
   focus: 0.12,       // 焦点遮罩
   selected: 0.16,    // 选中遮罩
   overlay: 0.40,     // 蒙层
+} as const;
+
+// ==================== 滚动条系统 ====================
+
+export const scrollbarSystem = {
+  // 尺寸
+  width: '4px',
+  height: '4px',
+  borderRadius: '2px',
+
+  // 颜色（直接引用）
+  thumbColor: semantic.text.tertiary,
+  thumbHoverColor: colors.primary[500],
+  trackColor: 'transparent',
+} as const;
+
+// ==================== 侧边栏系统 ====================
+
+export const sidebarSystem = {
+  // 左侧栏
+  leftWidth: '240px',
+  leftMinWidth: '200px',
+  leftMaxWidth: '300px',
+
+  // 右侧栏
+  rightWidth: '280px',
+  rightMinWidth: '220px',
+  rightMaxWidth: '350px',
+
+  // 折叠宽度
+  collapsedWidth: '64px',
+
+  // 响应式断点（引用 breakpoints）
+  autoCollapseBreakpoint: breakpoints.threeColumn,
+} as const;
+
+// ==================== 输入组件宽度系统 ====================
+
+export const inputWidths = {
+  xs: 80,
+  sm: 120,
+  md: 200,
+  lg: 240,
+  xl: 320,
+  search: 240,  // 搜索框标准宽度
+  select: 120,  // 下拉框标准宽度
+} as const;
+
+// ==================== 表格列宽预设 ====================
+
+export const tableColumnWidths = {
+  checkbox: 48,         // 复选框列
+  index: 60,            // 序号列
+  action: 150,          // 操作列
+  actionCompact: 120,   // 紧凑操作列
+  status: 70,           // 状态列
+  type: 70,             // 类型列
+  date: 130,            // 日期列
+  datetime: 160,        // 日期时间列
+  number: 85,           // 数字列
+  name: 120,            // 名称列
+  description: 200,     // 描述列
+} as const;
+
+// ==================== 图标尺寸系统 ====================
+
+export const iconSizes = {
+  xs: '12px',
+  sm: '14px',
+  base: '16px',
+  md: '18px',
+  lg: '20px',
+  xl: '24px',
+  '2xl': '32px',
+} as const;
+
+// ==================== 按钮尺寸预设 ====================
+
+export const buttonSizes = {
+  iconButton: {
+    width: '32px',
+    height: '32px',
+  },
+  iconButtonLarge: {
+    width: '40px',
+    height: '40px',
+  },
+} as const;
+
+// ==================== 头像/容器尺寸系统 ====================
+
+export const avatarSizes = {
+  xs: '24px',
+  sm: '32px',
+  md: '40px',
+  lg: '48px',
+  xl: '64px',
+} as const;
+
+// ==================== Grid Gutter 预设 ====================
+
+export const gridGutter = {
+  none: 0,
+  xs: 8,
+  sm: 12,
+  default: 16,
+  md: 16,
+  lg: 24,
+  xl: 32,
 } as const;
 
 // ==================== 动画/过渡系统 ====================
@@ -385,6 +501,14 @@ export const designSystem = {
   zIndex,
   blur,
   opacity,
+  scrollbarSystem,     // 滚动条系统
+  sidebarSystem,       // 侧边栏系统
+  inputWidths,         // 输入组件宽度
+  tableColumnWidths,   // 表格列宽预设
+  iconSizes,           // 图标尺寸
+  buttonSizes,         // 按钮尺寸
+  avatarSizes,         // 头像尺寸
+  gridGutter,          // Grid gutter
   transitions,
 } as const;
 

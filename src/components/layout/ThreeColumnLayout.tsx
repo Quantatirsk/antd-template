@@ -9,7 +9,7 @@
  * - 底部状态栏（可选）
  */
 
-import { useState, useEffect, ReactNode } from 'react';
+import { useState, useEffect, useRef, ReactNode } from 'react';
 import { designSystem } from '@/styles/design-system';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 
@@ -39,14 +39,14 @@ interface ThreeColumnLayoutProps {
 
 export default function ThreeColumnLayout({
   topBar,
-  topBarHeight = '40px',
+  topBarHeight = designSystem.heights.toolbar,
   leftSidebar,
-  leftSidebarWidth = '240px',
+  leftSidebarWidth = designSystem.sidebarSystem.leftWidth,
   leftDefaultCollapsed = false,
   onLeftCollapsedChange,
   children,
   rightSidebar,
-  rightSidebarWidth = '280px',
+  rightSidebarWidth = designSystem.sidebarSystem.rightWidth,
   rightDefaultCollapsed = false,
   onRightCollapsedChange,
   bottomBar,
@@ -54,42 +54,81 @@ export default function ThreeColumnLayout({
   const [leftCollapsed, setLeftCollapsed] = useState(leftDefaultCollapsed);
   const [rightCollapsed, setRightCollapsed] = useState(rightDefaultCollapsed);
 
+  // 记住用户在宽屏时的手动设置状态（用于窗口拉宽后恢复）
+  const leftUserPreference = useRef(leftDefaultCollapsed);
+  const rightUserPreference = useRef(rightDefaultCollapsed);
+
+  // 记录上一次的 isWideEnough 状态，用于检测窗口宽度变化
+  const prevIsWideEnough = useRef<boolean | null>(null);
+
   // 处理折叠状态变化
-  const handleLeftCollapse = (collapsed: boolean) => {
+  const handleLeftCollapse = (collapsed: boolean, isUserAction = false) => {
     setLeftCollapsed(collapsed);
     onLeftCollapsedChange?.(collapsed);
+
+    // 如果是用户手动操作且窗口足够宽，保存偏好
+    if (isUserAction && isWideEnough) {
+      leftUserPreference.current = collapsed;
+    }
   };
 
-  const handleRightCollapse = (collapsed: boolean) => {
+  const handleRightCollapse = (collapsed: boolean, isUserAction = false) => {
     setRightCollapsed(collapsed);
     onRightCollapsedChange?.(collapsed);
+
+    // 如果是用户手动操作且窗口足够宽，保存偏好
+    if (isUserAction && isWideEnough) {
+      rightUserPreference.current = collapsed;
+    }
   };
 
   // 响应式断点：小于 900px 自动折叠侧边栏
   // 计算：左侧 240px + 右侧最小 220px + 主内容最小 400px = 860px，加上边距设为 900px
-  const isWideEnough = useMediaQuery('(min-width: 900px)');
+  const isWideEnough = useMediaQuery(`(min-width: ${designSystem.breakpoints.threeColumn})`);
 
   // 响应式折叠/展开侧边栏
   useEffect(() => {
-    if (!isWideEnough) {
-      // 窗口太小，自动折叠
+    // 初始化
+    if (prevIsWideEnough.current === null) {
+      prevIsWideEnough.current = isWideEnough;
+      return;
+    }
+
+    const wasWideEnough = prevIsWideEnough.current;
+
+    // 窗口从宽变窄：保存当前状态并自动折叠
+    if (wasWideEnough && !isWideEnough) {
+      leftUserPreference.current = leftCollapsed;
+      rightUserPreference.current = rightCollapsed;
       handleLeftCollapse(true);
       handleRightCollapse(true);
-    } else {
-      // 窗口足够大，恢复展开（恢复到初始默认值）
-      handleLeftCollapse(leftDefaultCollapsed);
-      handleRightCollapse(rightDefaultCollapsed);
     }
-  }, [isWideEnough, leftDefaultCollapsed, rightDefaultCollapsed]);
+
+    // 窗口从窄变宽：恢复用户偏好
+    if (!wasWideEnough && isWideEnough) {
+      handleLeftCollapse(leftUserPreference.current);
+      handleRightCollapse(rightUserPreference.current);
+    }
+
+    prevIsWideEnough.current = isWideEnough;
+  }, [isWideEnough]);
 
   // 监听外部状态变化（支持受控模式）
   useEffect(() => {
     setLeftCollapsed(leftDefaultCollapsed);
-  }, [leftDefaultCollapsed]);
+    // 如果窗口足够宽，同步更新用户偏好
+    if (isWideEnough) {
+      leftUserPreference.current = leftDefaultCollapsed;
+    }
+  }, [leftDefaultCollapsed, isWideEnough]);
 
   useEffect(() => {
     setRightCollapsed(rightDefaultCollapsed);
-  }, [rightDefaultCollapsed]);
+    // 如果窗口足够宽，同步更新用户偏好
+    if (isWideEnough) {
+      rightUserPreference.current = rightDefaultCollapsed;
+    }
+  }, [rightDefaultCollapsed, isWideEnough]);
 
   return (
     <div
@@ -124,8 +163,8 @@ export default function ThreeColumnLayout({
           <div
             style={{
               width: leftSidebarWidth,
-              minWidth: '200px',
-              maxWidth: '300px',
+              minWidth: designSystem.sidebarSystem.leftMinWidth,
+              maxWidth: designSystem.sidebarSystem.leftMaxWidth,
               flexShrink: 0,
               backgroundColor: designSystem.semantic.surface.base,
               display: 'flex',
@@ -149,8 +188,8 @@ export default function ThreeColumnLayout({
           <div
             style={{
               flexBasis: rightSidebarWidth,
-              minWidth: '220px',
-              maxWidth: '350px',
+              minWidth: designSystem.sidebarSystem.rightMinWidth,
+              maxWidth: designSystem.sidebarSystem.rightMaxWidth,
               flexShrink: 1,
               flexGrow: 0,
               backgroundColor: designSystem.semantic.surface.base,
@@ -171,7 +210,7 @@ export default function ThreeColumnLayout({
         <div
           style={{
             flexShrink: 0,
-            boxShadow: '0 -1px 2px 0 rgba(0, 0, 0, 0.05)',
+            boxShadow: designSystem.shadows.xs,
             display: 'flex',
             alignItems: 'center',
             padding: designSystem.spacing[1],  // 8px 最紧凑布局

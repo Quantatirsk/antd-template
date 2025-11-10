@@ -159,7 +159,7 @@ export default function ListPage() {
       dataIndex: 'name',
       key: 'name',
       fixed: 'left',
-      width: 120,  // 140 -> 120 更紧凑
+      width: designSystem.tableColumnWidths.name,
       render: (text, record) => (
         <a onClick={() => { setSelectedItem(record); }}>{text}</a>
       ),
@@ -168,14 +168,14 @@ export default function ListPage() {
       title: '描述',
       dataIndex: 'description',
       key: 'description',
-      width: 200,  // 设置固定宽度，避免过宽
+      width: designSystem.tableColumnWidths.description,
       ellipsis: true,
     },
     {
       title: '状态',
       dataIndex: 'status',
       key: 'status',
-      width: 70,
+      width: designSystem.tableColumnWidths.status,
       render: (status: string) => {
         const colorMap: Record<string, string> = { active: 'green', archived: 'gray', draft: 'orange' };
         const textMap: Record<string, string> = { active: '活跃', archived: '归档', draft: '草稿' };
@@ -186,7 +186,7 @@ export default function ListPage() {
       title: '类型',
       dataIndex: 'type',
       key: 'type',
-      width: 70,
+      width: designSystem.tableColumnWidths.type,
       render: (type: string) => {
         const textMap: Record<string, string> = { typeA: '类型A', typeB: '类型B', typeC: '类型C' };
         return textMap[type];
@@ -196,7 +196,7 @@ export default function ListPage() {
       title: '节点数',
       dataIndex: 'nodeCount',
       key: 'nodeCount',
-      width: 85,
+      width: designSystem.tableColumnWidths.number,
       align: 'right',
       sorter: (a, b) => (a.nodeCount || 0) - (b.nodeCount || 0),
       render: (count: number) => count?.toLocaleString(),
@@ -205,7 +205,7 @@ export default function ListPage() {
       title: '边数',
       dataIndex: 'edgeCount',
       key: 'edgeCount',
-      width: 85,
+      width: designSystem.tableColumnWidths.number,
       align: 'right',
       sorter: (a, b) => (a.edgeCount || 0) - (b.edgeCount || 0),
       render: (count: number) => count?.toLocaleString(),
@@ -214,7 +214,7 @@ export default function ListPage() {
       title: '创建时间',
       dataIndex: 'createdAt',
       key: 'createdAt',
-      width: 130,  // 140 -> 130 更紧凑
+      width: designSystem.tableColumnWidths.date,
       render: (date: string) => {
         const d = new Date(date);
         return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
@@ -225,10 +225,10 @@ export default function ListPage() {
       title: '操作',
       key: 'action',
       fixed: 'right',
-      width: 150,  // 130 -> 150 确保按钮完整显示
-      align: 'center',  // 标题和内容居中对齐
+      width: designSystem.tableColumnWidths.action,
+      align: 'center',
       render: (_, record) => (
-        <Space size={4}>
+        <Space size={parseInt(designSystem.spacing[0.5])}>
           <Button type="link" size="small" icon={<EditOutlined />} onClick={() => handleEdit(record)}>
             编辑
           </Button>
@@ -255,13 +255,13 @@ export default function ListPage() {
         placeholder="搜索名称或描述..."
         value={searchText}
         onChange={e => setSearchText(e.target.value)}
-        style={{ width: 240 }}
+        style={{ width: designSystem.inputWidths.search }}
         allowClear
       />
       <Select
         value={statusFilter}
         onChange={setStatusFilter}
-        style={{ width: 120 }}
+        style={{ width: designSystem.inputWidths.select }}
         options={[
           { label: '全部状态', value: 'all' },
           { label: '活跃', value: 'active' },
@@ -353,27 +353,27 @@ export default function ListPage() {
           <Card size="small" title="详情" style={{ marginBottom: designSystem.spacing[1], borderRadius: designSystem.borderRadius.lg }}>  {/* 8px */}
             <div style={{ fontSize: designSystem.typography.fontSize.xs }}>
               <div style={{ marginBottom: designSystem.spacing[1] }}>  {/* 8px */}
-                <div style={{ color: designSystem.semantic.text.secondary, marginBottom: 2 }}>名称:</div>
+                <div style={{ color: designSystem.semantic.text.secondary, marginBottom: designSystem.spacing[0.25] }}>名称:</div>
                 <div style={{ color: designSystem.semantic.text.primary }}>{selectedItem.name}</div>
               </div>
               <div style={{ marginBottom: designSystem.spacing[1] }}>  {/* 8px */}
-                <div style={{ color: designSystem.semantic.text.secondary, marginBottom: 2 }}>描述:</div>
+                <div style={{ color: designSystem.semantic.text.secondary, marginBottom: designSystem.spacing[0.25] }}>描述:</div>
                 <div style={{ color: designSystem.semantic.text.primary }}>{selectedItem.description}</div>
               </div>
               <div style={{ marginBottom: designSystem.spacing[1] }}>  {/* 8px */}
-                <div style={{ color: designSystem.semantic.text.secondary, marginBottom: 2 }}>状态:</div>
+                <div style={{ color: designSystem.semantic.text.secondary, marginBottom: designSystem.spacing[0.25] }}>状态:</div>
                 <div><Tag color={selectedItem.status === 'active' ? 'green' : 'gray'}>{selectedItem.status}</Tag></div>
               </div>
               <div style={{ marginBottom: designSystem.spacing[1] }}>  {/* 8px */}
-                <div style={{ color: designSystem.semantic.text.secondary, marginBottom: 2 }}>节点数:</div>
+                <div style={{ color: designSystem.semantic.text.secondary, marginBottom: designSystem.spacing[0.25] }}>节点数:</div>
                 <div style={{ color: designSystem.semantic.text.primary }}>{selectedItem.nodeCount?.toLocaleString()}</div>
               </div>
               <div style={{ marginBottom: designSystem.spacing[1] }}>  {/* 8px */}
-                <div style={{ color: designSystem.semantic.text.secondary, marginBottom: 2 }}>边数:</div>
+                <div style={{ color: designSystem.semantic.text.secondary, marginBottom: designSystem.spacing[0.25] }}>边数:</div>
                 <div style={{ color: designSystem.semantic.text.primary }}>{selectedItem.edgeCount?.toLocaleString()}</div>
               </div>
               <div>
-                <div style={{ color: designSystem.semantic.text.secondary, marginBottom: 2 }}>创建时间:</div>
+                <div style={{ color: designSystem.semantic.text.secondary, marginBottom: designSystem.spacing[0.25] }}>创建时间:</div>
                 <div style={{ color: designSystem.semantic.text.primary }}>{new Date(selectedItem.createdAt).toLocaleString('zh-CN')}</div>
               </div>
             </div>
@@ -417,7 +417,7 @@ export default function ListPage() {
             color: leftCollapsed ? designSystem.semantic.text.tertiary : designSystem.colors.primary[500],
             display: 'flex',
             alignItems: 'center',
-            gap: '4px',
+            gap: designSystem.spacing[0.5],
           }}
         >
           <span style={{ fontSize: designSystem.componentFontSize.button }}>
@@ -434,7 +434,7 @@ export default function ListPage() {
             color: rightCollapsed ? designSystem.semantic.text.tertiary : designSystem.colors.primary[500],
             display: 'flex',
             alignItems: 'center',
-            gap: '4px',
+            gap: designSystem.spacing[0.5],
           }}
         >
           <span style={{ fontSize: designSystem.componentFontSize.button }}>
@@ -483,7 +483,7 @@ export default function ListPage() {
                 margin: designSystem.spacing[1],  // 8px - 与左侧边栏对齐，防止阴影裁剪
                 minHeight: 0,
               }}
-              styles={{ body: { padding: 12, flex: 1, overflow: 'hidden' } }}
+              styles={{ body: { padding: parseInt(designSystem.spacing[2]), flex: 1, overflow: 'hidden' } }}
             >
               <Table
                 size="small"
@@ -503,7 +503,7 @@ export default function ListPage() {
                 rowSelection={{
                   selectedRowKeys: selectedKeys,
                   onChange: setSelectedKeys as any,
-                  columnWidth: 48,  // 固定勾选框列宽度
+                  columnWidth: designSystem.tableColumnWidths.checkbox,
                 }}
                 scroll={{ x: 1000, y: 'calc(100vh - 306px)' }}  // 自适应高度: Header(56) + topBar(56) + 表头(32) + 分页器(40) + 底部栏(28) + 间隙(34) + Card margin(16) + padding(44) = 306px
               />
@@ -511,7 +511,7 @@ export default function ListPage() {
           ) : (
             <div style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+              gridTemplateColumns: `repeat(auto-fill, minmax(${designSystem.cardSystem.minWidth}, 1fr))`,
               gap: designSystem.spacing[1],  // 8px
               flex: 1,
               overflow: 'auto',

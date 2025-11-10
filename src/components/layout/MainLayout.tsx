@@ -101,8 +101,8 @@ export default function MainLayout() {
               setTooltipOpen(false);
             }}
             style={{
-              width: 32,
-              height: 32,
+              width: designSystem.buttonSizes.iconButton.width,
+              height: designSystem.buttonSizes.iconButton.height,
               marginLeft: collapsed ? 'auto' : 0,
               marginRight: collapsed ? 'auto' : 0,
             }}
@@ -128,8 +128,8 @@ export default function MainLayout() {
       {/* 桌面侧边栏 */}
       <Sider
         theme="light"
-        width={240}
-        collapsedWidth={64}
+        width={parseInt(designSystem.sidebarSystem.leftWidth)}
+        collapsedWidth={parseInt(designSystem.sidebarSystem.collapsedWidth)}
         collapsed={collapsed}
         trigger={null}
         style={{
@@ -165,7 +165,10 @@ export default function MainLayout() {
         />
       </Drawer>
 
-      <Layout style={{ marginLeft: collapsed ? 64 : 240, transition: 'margin-left 0.2s' }}>
+      <Layout style={{
+        marginLeft: collapsed ? parseInt(designSystem.sidebarSystem.collapsedWidth) : parseInt(designSystem.sidebarSystem.leftWidth),
+        transition: 'margin-left 0.2s'
+      }}>
         <Header
           style={{
             backgroundColor: designSystem.semantic.surface.base,

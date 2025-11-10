@@ -121,7 +121,7 @@ export default function DashboardPage() {
       </h1>
 
       {/* 统计卡片 */}
-      <Row gutter={[16, 16]} style={{ marginBottom: designSystem.spacing[6] }}>
+      <Row gutter={[designSystem.gridGutter.default, designSystem.gridGutter.default]} style={{ marginBottom: designSystem.spacing[6] }}>
         {mockStats.map((stat, index) => (
           <Col key={index} xs={24} sm={12} lg={6}>
             <Card>
@@ -155,7 +155,7 @@ export default function DashboardPage() {
       </Row>
 
       {/* 图表区域 */}
-      <Row gutter={[16, 16]} style={{ marginBottom: designSystem.spacing[6] }}>
+      <Row gutter={[designSystem.gridGutter.default, designSystem.gridGutter.default]} style={{ marginBottom: designSystem.spacing[6] }}>
         {/* 趋势图 */}
         <Col xs={24} lg={16}>
           <Card title="查询趋势" extra={<Button type="link">查看更多</Button>}>
@@ -164,7 +164,7 @@ export default function DashboardPage() {
                 <div key={index} style={{ textAlign: 'center', flex: 1 }}>
                   <div
                     style={{
-                      height: `${(item.value / 1500) * 250}px`,
+                      height: `${(item.value / 1500) * parseInt(designSystem.avatarSizes.xl) * 4}px`,
                       background: `linear-gradient(to top, ${designSystem.colors.primary[500]}, ${designSystem.colors.primary[300]})`,
                       borderRadius: designSystem.borderRadius.sm,
                       marginBottom: designSystem.spacing[2],
@@ -205,7 +205,7 @@ export default function DashboardPage() {
       </Row>
 
       {/* 最近活动 + 快捷操作 */}
-      <Row gutter={[16, 16]}>
+      <Row gutter={[designSystem.gridGutter.default, designSystem.gridGutter.default]}>
         {/* 最近活动 */}
         <Col xs={24} lg={16}>
           <Card title="最近活动" extra={<Button type="link">查看全部</Button>}>
@@ -219,10 +219,10 @@ export default function DashboardPage() {
                       avatar={
                         <div
                           style={{
-                            width: '40px',
-                            height: '40px',
+                            width: designSystem.avatarSizes.md,
+                            height: designSystem.avatarSizes.md,
                             borderRadius: '50%',
-                            background: `${color}20`,
+                            background: `${color}${Math.round(designSystem.opacity.hover * 255).toString(16).padStart(2, '0')}`,
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',

@@ -9,30 +9,30 @@ import { designSystem } from './design-system';
 export function GlobalStyles() {
   const styles = `
     /* 全局滚动条样式 - 统一设计 */
-    /* 配置来源: designSystem.spacing, designSystem.colors */
+    /* 配置来源: designSystem.scrollbarSystem */
     * {
       scrollbar-width: thin;  /* Firefox */
-      scrollbar-color: ${designSystem.semantic.text.tertiary} transparent;  /* Firefox: thumb track */
+      scrollbar-color: ${designSystem.scrollbarSystem.thumbColor} ${designSystem.scrollbarSystem.trackColor};  /* Firefox: thumb track */
     }
 
     /* WebKit 浏览器 (Chrome, Safari, Edge) */
     *::-webkit-scrollbar {
-      width: 4px;  /* 垂直滚动条宽度 - 极简设计 */
-      height: 4px;  /* 水平滚动条高度 */
+      width: ${designSystem.scrollbarSystem.width};  /* 垂直滚动条宽度 */
+      height: ${designSystem.scrollbarSystem.height};  /* 水平滚动条高度 */
     }
 
     *::-webkit-scrollbar-track {
-      background: transparent;  /* 轨道背景透明 */
+      background: ${designSystem.scrollbarSystem.trackColor};  /* 轨道背景 */
     }
 
     *::-webkit-scrollbar-thumb {
-      background-color: ${designSystem.semantic.text.tertiary};  /* 滑块颜色 - 浅灰 */
-      border-radius: 2px;  /* 圆角 */
+      background-color: ${designSystem.scrollbarSystem.thumbColor};  /* 滑块颜色 */
+      border-radius: ${designSystem.scrollbarSystem.borderRadius};  /* 圆角 */
       transition: background-color ${designSystem.transitions.fast};  /* 平滑过渡 */
     }
 
     *::-webkit-scrollbar-thumb:hover {
-      background-color: ${designSystem.colors.primary[500]};  /* hover 时变为品牌色 */
+      background-color: ${designSystem.scrollbarSystem.thumbHoverColor};  /* hover 时变为品牌色 */
     }
 
     /* 确保滚动条尺寸不变 */
@@ -59,7 +59,7 @@ export function GlobalStyles() {
     }
 
     .ant-card-body {
-      padding: ${designSystem.spacing[3]} !important;  /* 12px (全局默认) */
+      padding: ${designSystem.spacing[2]} !important;  /* 12px (卡片紧凑padding) */
     }
 
     /* 卡片操作栏样式 - 极致紧凑设计 */
@@ -70,7 +70,7 @@ export function GlobalStyles() {
     }
 
     .ant-card-actions > li {
-      margin: 6px 0 !important;  /* 上下各6px，总高度约28px */
+      margin: ${designSystem.spacing[0.75]} 0 !important;  /* 上下各6px，总高度约28px */
       padding: 0 !important;
     }
 
@@ -84,7 +84,7 @@ export function GlobalStyles() {
     }
 
     .ant-card-actions > li > span > .anticon {
-      font-size: 16px !important;  /* 图标稍大保持可点击性 */
+      font-size: ${designSystem.iconSizes.base} !important;  /* 图标稍大保持可点击性 */
     }
 
     /* Table容器卡片样式 - 统一Table组件外观 */
@@ -139,7 +139,7 @@ export function GlobalStyles() {
 
     .ant-table-pagination {
       flex-shrink: 0 !important;
-      margin-top: 12px !important;
+      margin-top: ${designSystem.spacing[2]} !important;
     }
 
     /* 分页器字体大小 */
