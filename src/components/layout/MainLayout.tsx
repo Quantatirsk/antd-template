@@ -72,17 +72,21 @@ export default function MainLayout() {
           padding: `0 ${collapsed ? designSystem.spacing[4] : designSystem.spacing[6]}`,
         }}
       >
-        {!collapsed && (
-          <span
-            style={{
-              fontSize: designSystem.typography.fontSize.lg,
-              fontWeight: designSystem.typography.fontWeight.semibold,
-              color: designSystem.colors.primary[500],
-            }}
-          >
-            Ant Design
-          </span>
-        )}
+        <span
+          style={{
+            fontSize: designSystem.typography.fontSize.lg,
+            fontWeight: designSystem.typography.fontWeight.semibold,
+            color: designSystem.colors.primary[500],
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            opacity: collapsed ? 0 : 1,
+            width: collapsed ? 0 : 'auto',
+            transition: `opacity ${designSystem.transitions.fast}, width ${designSystem.transitions.default}`,
+            transitionDelay: collapsed ? '0ms' : '150ms', // 展开时延迟显示文字
+          }}
+        >
+          Ant Design
+        </span>
         <Tooltip
           title={collapsed ? '展开菜单' : '折叠菜单'}
           placement="right"
@@ -129,13 +133,14 @@ export default function MainLayout() {
         collapsed={collapsed}
         trigger={null}
         style={{
-          borderRight: `1px solid ${designSystem.semantic.surface.border}`,
+          boxShadow: designSystem.cardSystem.shadow,
           overflow: 'auto',
           height: '100vh',
           position: 'fixed',
           left: 0,
           top: 0,
           bottom: 0,
+          zIndex: 100,
         }}
       >
         {menuContent}
@@ -163,8 +168,8 @@ export default function MainLayout() {
       <Layout style={{ marginLeft: collapsed ? 64 : 240, transition: 'margin-left 0.2s' }}>
         <Header
           style={{
-            backgroundColor: designSystem.semantic.surface.primary,
-            borderBottom: `1px solid ${designSystem.semantic.surface.border}`,
+            backgroundColor: designSystem.semantic.surface.base,
+            boxShadow: designSystem.cardSystem.shadow,
             padding: `0 ${designSystem.spacing[6]}`,
             display: 'flex',
             alignItems: 'center',
@@ -172,7 +177,7 @@ export default function MainLayout() {
             height: designSystem.heights.header,
             position: 'sticky',
             top: 0,
-            zIndex: 1,
+            zIndex: 50,
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: designSystem.spacing[4] }}>
@@ -196,7 +201,8 @@ export default function MainLayout() {
         <Content
           style={{
             height: `calc(100vh - ${designSystem.heights.header})`,
-            overflow: 'hidden',
+            overflow: 'auto',
+            padding: designSystem.spacing[1],  // 8px 最紧凑布局
           }}
         >
           <Outlet />

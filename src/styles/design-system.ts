@@ -2,9 +2,10 @@
  * Ant Design Template - Design System
  *
  * 设计原则：
- * - 基于 4px 网格系统
+ * - 基于 8px 网格系统（Apple iOS 标准）
  * - 主色调：#005BAC
- * - 参考专业软件（Photoshop、Figma、VS Code）的布局规范
+ * - Apple级现代化设计语言
+ * - 统一配置驱动，避免硬编码
  */
 
 // ==================== 色彩系统 ====================
@@ -24,19 +25,15 @@ export const colors = {
     900: '#002B54',
   },
 
-  // 中性色
+  // 中性色（Apple级7级精简系统）
   neutral: {
-    0: '#FFFFFF',    // 纯白
-    50: '#F9FAFB',   // 浅灰背景
-    100: '#F3F4F6',  // 工具栏背景
-    200: '#E5E7EB',  // 边框
-    300: '#D1D5DB',  // 分隔线
-    400: '#9CA3AF',  // 次要文字
-    500: '#6B7280',  // 辅助文字
-    600: '#4B5563',  // 正文
-    700: '#374151',  // 标题
-    800: '#1F2937',  // 深色文字
-    900: '#111827',  // 最深文字
+    0: '#FFFFFF',    // 纯白 - 卡片、面板
+    50: '#F5F5F7',   // Apple Gray - 页面背景（更冷、更干净）
+    100: '#E8E8ED',  // 分隔线、禁用背景
+    200: '#D1D1D6',  // 边框、次要分隔
+    400: '#8E8E93',  // 次要文字、图标
+    600: '#48484A',  // 正文、主要图标
+    900: '#1C1C1E',  // 标题、强调文字
   },
 
   // 功能色
@@ -46,19 +43,22 @@ export const colors = {
   info: '#2680C7', // 基于主色 primary.400
 } as const;
 
-// 语义化颜色
+// 语义化颜色（Apple级语义系统）
 export const semantic = {
   surface: {
-    primary: colors.neutral[0],      // 主背景 - 白色
-    secondary: colors.neutral[50],   // 次背景 - 极浅灰
-    tertiary: colors.neutral[100],   // 工具栏背景 - 浅灰
-    border: colors.neutral[200],     // 边框
-    divider: colors.neutral[300],    // 分隔线
+    base: colors.neutral[0],         // 卡片、面板、悬浮元素
+    background: colors.neutral[50],  // 页面背景
+    elevated: colors.neutral[0],     // 提升元素（Modal、Popover）
+    overlay: 'rgba(0, 0, 0, 0.4)',  // 蒙层
+  },
+  border: {
+    light: colors.neutral[100],      // 浅色边框、分隔线
+    medium: colors.neutral[200],     // 标准边框
   },
   text: {
-    primary: colors.neutral[900],    // 主文字
-    secondary: colors.neutral[600],  // 次要文字
-    tertiary: colors.neutral[400],   // 辅助文字
+    primary: colors.neutral[900],    // 标题、主要内容
+    secondary: colors.neutral[600],  // 正文、次要内容
+    tertiary: colors.neutral[400],   // 辅助文字、禁用状态
     inverse: colors.neutral[0],      // 反色文字
   },
   interactive: {
@@ -69,96 +69,228 @@ export const semantic = {
   },
 } as const;
 
-// ==================== 间距系统（基于 4px 网格）====================
+// ==================== 间距系统（Apple级8px基础网格）====================
 
 export const spacing = {
   0: '0',
-  1: '4px',    // 最小间距
-  2: '8px',    // 紧凑间距
-  3: '12px',   // 小间距
-  4: '16px',   // 标准间距
-  5: '20px',   // 中等间距
-  6: '24px',   // 大间距
-  8: '32px',   // 超大间距
-  10: '40px',  // 区域间距
-  12: '48px',  // 超大区域间距
-  16: '64px',  // 特大区域间距
+  1: '8px',    // 最小间距（iOS列表内元素）
+  2: '12px',   // 紧凑间距（标签、小按钮）
+  3: '16px',   // 标准间距（卡片内元素、表单间距）
+  4: '20px',   // 舒适间距（卡片padding）
+  5: '24px',   // 大间距（卡片之间、区块内部）
+  6: '32px',   // 区域间距（页面section之间）
+  8: '40px',   // 大区域间距（页面顶部、底部）
+  10: '48px',  // 超大区域间距（页面板块）
+  12: '64px',  // 页面级间距（hero区域）
+  16: '80px',  // 特大页面间距
 } as const;
 
-// ==================== 高度系统 ====================
+// ==================== 高度系统（8px网格对齐）====================
 
 export const heights = {
-  // 顶部栏
-  header: '56px',       // 主标题栏（包含导航）
-  toolbar: '40px',      // 工具栏
+  // 导航与工具栏
+  header: '56px',       // 主标题栏（iOS标准）
+  toolbar: '48px',      // 工具栏（增加到48px，更易触控）
   breadcrumb: '32px',   // 面包屑
 
-  // 输入组件
-  inputSm: '24px',      // 小输入框
-  inputMd: '32px',      // 标准输入框
-  inputLg: '40px',      // 大输入框
+  // 输入组件（iOS最小触控44px）
+  inputSm: '32px',      // 小输入框（从24px增加）
+  inputMd: '40px',      // 标准输入框（从32px增加）
+  inputLg: '48px',      // 大输入框（从40px增加）
 
-  // 按钮
-  buttonSm: '24px',     // 小按钮
-  buttonMd: '32px',     // 标准按钮
-  buttonLg: '40px',     // 大按钮
+  // 按钮（符合iOS 44pt最小触控标准）
+  buttonSm: '32px',     // 小按钮（从24px增加）
+  buttonMd: '40px',     // 标准按钮（从32px增加）
+  buttonLg: '48px',     // 大按钮（从40px增加）
 
-  // 其他
-  listItem: '32px',     // 列表项
-  tableRow: '40px',     // 表格行
-  statusBar: '24px',    // 状态栏
-  tabBar: '40px',       // 标签栏
+  // 列表与表格
+  listItem: '44px',     // 列表项（iOS标准触控高度）
+  tableRow: '48px',     // 表格行（从40px增加）
+  statusBar: '32px',    // 状态栏（从24px增加）
+  tabBar: '48px',       // 标签栏（从40px增加）
+
+  // 触控目标（新增）
+  minTouch: '44px',     // iOS最小触控目标
 } as const;
 
-// ==================== 字体系统 ====================
+// ==================== 字体系统（iOS标准对齐）====================
 
 export const typography = {
+  // 字号（专业工具类网站 - 紧凑统一）
   fontSize: {
-    xs: '12px',
-    sm: '14px',
-    base: '16px',
-    lg: '18px',
-    xl: '20px',
-    '2xl': '24px',
-    '3xl': '30px',
-    '4xl': '36px',
+    xs: '11px',    // 极小文字（脚注、特殊标注）
+    sm: '12px',    // 辅助信息（Tag、Badge、分页器）
+    base: '13px',  // 核心字号（表格、按钮、表单、所有主要交互组件）
+    md: '15px',    // 正文（长文阅读、描述性内容）
+    lg: '20px',    // Title 3
+    xl: '22px',    // Title 2
+    '2xl': '28px', // Title 1
+    '3xl': '34px', // Large Title
+    '4xl': '40px', // 特大标题（自定义）
   },
+
+  // 字重（SF Pro字体标准）
   fontWeight: {
-    normal: 400,
-    medium: 500,
-    semibold: 600,
-    bold: 700,
+    light: 300,    // 新增：轻字重
+    normal: 400,   // Regular
+    medium: 500,   // Medium
+    semibold: 600, // Semibold
+    bold: 700,     // Bold
   },
+
+  // 行高（优化可读性）
   lineHeight: {
-    tight: 1.25,
-    normal: 1.5,
-    relaxed: 1.75,
+    tight: 1.2,      // 大标题专用
+    snug: 1.375,     // 副标题、按钮（新增）
+    normal: 1.5,     // 正文
+    relaxed: 1.625,  // 长文阅读
   },
+
+  // 字体家族
   fontFamily: {
-    sans: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+    sans: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif',
     mono: '"SF Mono", Monaco, "Cascadia Code", "Roboto Mono", Consolas, "Courier New", monospace',
   },
 } as const;
 
-// ==================== 圆角系统 ====================
+// ==================== 圆角系统（Apple级现代设计）====================
 
 export const borderRadius = {
   none: '0',
-  sm: '4px',
-  md: '8px',
-  lg: '12px',
-  xl: '16px',
-  full: '9999px',
+  sm: '4px',    // 小元素（Tag、Badge）
+  md: '6px',    // 标准按钮、输入框
+  lg: '10px',   // 卡片（从8px增加，更现代）
+  xl: '14px',   // Modal、Sheet
+  '2xl': '20px', // 大卡片、面板（新增）
+  '3xl': '28px', // Hero区域（新增）
+  full: '9999px', // 圆形
 } as const;
 
-// ==================== 阴影系统 ====================
+// ==================== 阴影系统（Apple级多层叠加）====================
 
 export const shadows = {
   none: 'none',
-  sm: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
-  md: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-  lg: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
-  xl: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+
+  // 卡片阴影（多层叠加，更立体）
+  xs: '0 1px 2px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04)',
+  sm: '0 2px 8px rgba(0, 0, 0, 0.08), 0 1px 4px rgba(0, 0, 0, 0.04)',
+  md: '0 4px 16px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06)',
+  lg: '0 8px 24px rgba(0, 0, 0, 0.15), 0 4px 12px rgba(0, 0, 0, 0.08)',
+  xl: '0 16px 48px rgba(0, 0, 0, 0.18), 0 8px 24px rgba(0, 0, 0, 0.10)',
+  '2xl': '0 24px 64px rgba(0, 0, 0, 0.20), 0 12px 32px rgba(0, 0, 0, 0.12)',
+
+  // 特殊用途阴影
+  inner: 'inset 0 2px 4px 0 rgba(0, 0, 0, 0.06)', // 内阴影
+  focus: '0 0 0 4px rgba(0, 91, 172, 0.15)',       // 焦点环（使用你的品牌色）
+} as const;
+
+// ==================== 卡片系统（Apple级现代设计）====================
+
+export const cardSystem = {
+  // 卡片圆角（增大到10px）
+  borderRadius: borderRadius.lg,  // 10px
+
+  // 卡片背景色
+  background: colors.neutral[0],   // 纯白
+
+  // 卡片阴影（使用新的增强阴影）
+  shadow: shadows.sm,              // 默认：更深的阴影
+  shadowHover: shadows.md,         // 悬停：明显提升
+  shadowElevated: shadows.lg,      // 提升：大幅度分层
+
+  // 卡片内边距（增加到20px，大卡片24px）
+  padding: spacing[4],             // 20px（从16px增加）
+  paddingLarge: spacing[5],        // 24px（大卡片专用）
+  paddingCompact: spacing[3],      // 16px（紧凑卡片）
+
+  // 元素间距
+  gap: spacing[3],                 // 16px（从12px增加）
+  gapSmall: spacing[2],           // 12px（紧凑元素）
+
+  // 卡片外边距
+  margin: spacing[5],              // 24px（从16px增加）
+  marginCompact: spacing[3],       // 16px（紧凑布局）
+
+  // 页面背景色（Apple Gray - 更干净）
+  pageBackground: colors.neutral[50],  // #F5F5F7
+
+  // Hover交互效果
+  hover: {
+    translateY: '-1px',           // 卡片上浮距离
+    scale: 1.02,                  // 轻微放大比例
+  },
+} as const;
+
+// ==================== Tooltip 组件系统 ====================
+
+export const tooltipSystem = {
+  // 字体大小由 componentFontSize.tooltip 统一管理
+
+  // 内边距
+  paddingBlock: spacing[1],              // 8px 上下
+  paddingInline: spacing[2],             // 12px 左右
+
+  // 背景与边框
+  background: 'rgba(0, 0, 0, 0.85)',     // 半透明黑色
+  borderRadius: borderRadius.sm,          // 4px
+
+  // 阴影
+  boxShadow: shadows.md,
+
+  // 最大宽度
+  maxWidth: '300px',
+
+  // 过渡动画
+  transition: '150ms cubic-bezier(0.4, 0, 0.2, 1)',  // 快速动画
+} as const;
+
+// ==================== Table 组件系统 ====================
+
+export const tableSystem = {
+  // Table容器卡片样式
+  containerBorderRadius: borderRadius.lg,  // 10px
+  containerBackground: colors.neutral[0],
+  containerShadow: shadows.sm,
+  containerShadowHover: shadows.md,
+  containerPadding: spacing[4],             // 20px（与卡片一致）
+
+  // Hover效果
+  hoverTranslateY: '-1px',                  // 上浮距离
+  hoverTransition: '200ms cubic-bezier(0.4, 0, 0.2, 1)', // 过渡时间
+
+  // Table内部样式
+  rowHoverBackground: colors.neutral[50],   // 行hover背景
+  headerBackground: colors.neutral[0],      // 表头背景（白色）
+  borderColor: colors.neutral[100],         // 边框颜色
+} as const;
+
+// ==================== 组件字体系统（语义化统一配置）====================
+
+export const componentFontSize = {
+  // 全局基础字号（Ant Design ConfigProvider token.fontSize）
+  global: typography.fontSize.base,  // 13px - 所有组件默认继承
+
+  // 表格系统
+  tableHeader: typography.fontSize.base,    // 13px - 表头
+  tableCell: typography.fontSize.base,      // 13px - 单元格
+
+  // 交互组件
+  button: typography.fontSize.base,         // 13px - 按钮
+  input: typography.fontSize.base,          // 13px - 输入框
+  select: typography.fontSize.base,         // 13px - 下拉选择（展示和选项统一）
+  checkbox: typography.fontSize.base,       // 13px - 复选框
+  radio: typography.fontSize.base,          // 13px - 单选框
+
+  // 辅助组件（较小字号）
+  tag: typography.fontSize.sm,              // 12px - 标签
+  badge: typography.fontSize.sm,            // 12px - 徽标
+  pagination: typography.fontSize.sm,       // 12px - 分页器
+  tooltip: typography.fontSize.base,        // 13px - 提示框（保持清晰）
+
+  // 布局组件
+  menu: typography.fontSize.base,           // 13px - 菜单
+  list: typography.fontSize.base,           // 13px - 列表
+  formLabel: typography.fontSize.base,      // 13px - 表单标签
 } as const;
 
 // ==================== 断点系统 ====================
@@ -174,6 +306,7 @@ export const breakpoints = {
 // ==================== Z-Index 层级 ====================
 
 export const zIndex = {
+  base: 0,
   dropdown: 1000,
   sticky: 1020,
   fixed: 1030,
@@ -181,6 +314,57 @@ export const zIndex = {
   modal: 1050,
   popover: 1060,
   tooltip: 1070,
+} as const;
+
+// ==================== 模糊效果（Apple毛玻璃）====================
+
+export const blur = {
+  none: '0',
+  sm: 'blur(8px)',   // 轻微模糊
+  md: 'blur(16px)',  // 标准模糊
+  lg: 'blur(24px)',  // 强模糊
+  xl: 'blur(40px)',  // 超强模糊（背景虚化）
+} as const;
+
+// ==================== 不透明度层级 ====================
+
+export const opacity = {
+  disabled: 0.38,    // 禁用状态
+  inactive: 0.50,    // 非活跃元素
+  hover: 0.08,       // 悬停遮罩
+  focus: 0.12,       // 焦点遮罩
+  selected: 0.16,    // 选中遮罩
+  overlay: 0.40,     // 蒙层
+} as const;
+
+// ==================== 动画/过渡系统 ====================
+
+export const transitions = {
+  // 时长
+  duration: {
+    instant: '100ms',
+    fast: '150ms',
+    base: '200ms',
+    slow: '300ms',
+    slower: '500ms',
+  },
+
+  // 缓动函数（Apple级）
+  easing: {
+    linear: 'linear',
+    ease: 'cubic-bezier(0.4, 0, 0.2, 1)',        // 标准
+    easeIn: 'cubic-bezier(0.4, 0, 1, 1)',        // 进入
+    easeOut: 'cubic-bezier(0, 0, 0.2, 1)',       // 离开
+    easeInOut: 'cubic-bezier(0.4, 0, 0.2, 1)',   // 进出
+    spring: 'cubic-bezier(0.34, 1.56, 0.64, 1)', // 弹性
+    bounce: 'cubic-bezier(0.68, -0.55, 0.27, 1.55)', // 弹跳
+  },
+
+  // 常用组合
+  default: '200ms cubic-bezier(0.4, 0, 0.2, 1)',
+  fast: '150ms cubic-bezier(0.4, 0, 0.2, 1)',
+  slow: '300ms cubic-bezier(0.4, 0, 0.2, 1)',
+  spring: '400ms cubic-bezier(0.34, 1.56, 0.64, 1)',
 } as const;
 
 // ==================== 完整设计系统导出 ====================
@@ -193,8 +377,15 @@ export const designSystem = {
   typography,
   borderRadius,
   shadows,
+  cardSystem,
+  tooltipSystem,
+  tableSystem,
+  componentFontSize,  // 组件字体系统
   breakpoints,
   zIndex,
+  blur,
+  opacity,
+  transitions,
 } as const;
 
 export default designSystem;

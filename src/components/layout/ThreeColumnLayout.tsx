@@ -25,6 +25,7 @@ interface ThreeColumnLayoutProps {
   leftSidebarWidth?: string;
   leftCollapsible?: boolean;
   leftDefaultCollapsed?: boolean;
+  onLeftCollapsedChange?: (collapsed: boolean) => void;
 
   // 主内容区
   children: ReactNode;
@@ -34,10 +35,17 @@ interface ThreeColumnLayoutProps {
   rightSidebarWidth?: string;
   rightCollapsible?: boolean;
   rightDefaultCollapsed?: boolean;
+  onRightCollapsedChange?: (collapsed: boolean) => void;
 
   // 底部状态栏
   bottomBar?: ReactNode;
   bottomBarHeight?: string;
+
+  // 折叠控制渲染函数（可选，用于自定义位置）
+  renderCollapseControls?: (controls: {
+    leftButton?: ReactNode;
+    rightButton?: ReactNode;
+  }) => ReactNode;
 }
 
 export default function ThreeColumnLayout({
@@ -47,17 +55,31 @@ export default function ThreeColumnLayout({
   leftSidebarWidth = '240px',
   leftCollapsible = true,
   leftDefaultCollapsed = false,
+  onLeftCollapsedChange,
   children,
   rightSidebar,
   rightSidebarWidth = '280px',
   rightCollapsible = true,
   rightDefaultCollapsed = false,
+  onRightCollapsedChange,
   bottomBar,
+  renderCollapseControls,
 }: ThreeColumnLayoutProps) {
   const [leftCollapsed, setLeftCollapsed] = useState(leftDefaultCollapsed);
   const [rightCollapsed, setRightCollapsed] = useState(rightDefaultCollapsed);
   const [leftTooltipOpen, setLeftTooltipOpen] = useState(false);
   const [rightTooltipOpen, setRightTooltipOpen] = useState(false);
+
+  // 处理折叠状态变化
+  const handleLeftCollapse = (collapsed: boolean) => {
+    setLeftCollapsed(collapsed);
+    onLeftCollapsedChange?.(collapsed);
+  };
+
+  const handleRightCollapse = (collapsed: boolean) => {
+    setRightCollapsed(collapsed);
+    onRightCollapsedChange?.(collapsed);
+  };
 
   // 响应式断点：小于 900px 自动折叠侧边栏
   // 计算：左侧 240px + 右侧最小 220px + 主内容最小 400px = 860px，加上边距设为 900px
@@ -67,14 +89,53 @@ export default function ThreeColumnLayout({
   useEffect(() => {
     if (!isWideEnough) {
       // 窗口太小，自动折叠
-      setLeftCollapsed(true);
-      setRightCollapsed(true);
+      handleLeftCollapse(true);
+      handleRightCollapse(true);
     } else {
       // 窗口足够大，恢复展开（恢复到初始默认值）
-      setLeftCollapsed(leftDefaultCollapsed);
-      setRightCollapsed(rightDefaultCollapsed);
+      handleLeftCollapse(leftDefaultCollapsed);
+      handleRightCollapse(rightDefaultCollapsed);
     }
   }, [isWideEnough, leftDefaultCollapsed, rightDefaultCollapsed]);
+
+  // 折叠按钮组件
+  const leftButton = leftSidebar && leftCollapsible ? (
+    <Tooltip
+      title={leftCollapsed ? '展开左侧边栏' : '折叠左侧边栏'}
+      placement="right"
+      open={leftTooltipOpen}
+      onOpenChange={setLeftTooltipOpen}
+    >
+      <Button
+        type="text"
+        size="small"
+        icon={leftCollapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+        onClick={() => {
+          handleLeftCollapse(!leftCollapsed);
+          setLeftTooltipOpen(false);
+        }}
+      />
+    </Tooltip>
+  ) : undefined;
+
+  const rightButton = rightSidebar && rightCollapsible ? (
+    <Tooltip
+      title={rightCollapsed ? '展开右侧边栏' : '折叠右侧边栏'}
+      placement="left"
+      open={rightTooltipOpen}
+      onOpenChange={setRightTooltipOpen}
+    >
+      <Button
+        type="text"
+        size="small"
+        icon={rightCollapsed ? <MenuFoldOutlined /> : <MenuUnfoldOutlined />}
+        onClick={() => {
+          handleRightCollapse(!rightCollapsed);
+          setRightTooltipOpen(false);
+        }}
+      />
+    </Tooltip>
+  ) : undefined;
 
   return (
     <div
@@ -83,7 +144,7 @@ export default function ThreeColumnLayout({
         flexDirection: 'column',
         height: '100%',
         minHeight: 0,
-        backgroundColor: designSystem.semantic.surface.primary,
+        backgroundColor: designSystem.semantic.surface.base,
       }}
     >
       {/* 顶部工具栏 */}
@@ -92,12 +153,13 @@ export default function ThreeColumnLayout({
           style={{
             minHeight: topBarHeight,
             flexShrink: 0,
-            borderBottom: `1px solid ${designSystem.semantic.surface.border}`,
+            backgroundColor: designSystem.semantic.surface.base,
             display: 'flex',
             alignItems: 'center',
+            zIndex: 10,
           }}
         >
-          {topBar}
+          {renderCollapseControls ? renderCollapseControls({ leftButton, rightButton }) : topBar}
         </div>
       )}
 
@@ -111,7 +173,7 @@ export default function ThreeColumnLayout({
               minWidth: '200px',
               maxWidth: '300px',
               flexShrink: 0,
-              borderRight: `1px solid ${designSystem.semantic.surface.border}`,
+              backgroundColor: designSystem.semantic.surface.base,
               display: 'flex',
               flexDirection: 'column',
               overflow: 'hidden',
@@ -125,8 +187,8 @@ export default function ThreeColumnLayout({
 
         {/* 主内容区 */}
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, minWidth: 0 }}>
-          {/* 折叠按钮容器 */}
-          {((leftSidebar && leftCollapsible) || (rightSidebar && rightCollapsible)) && (
+          {/* 折叠按钮容器 - 仅在未自定义渲染时显示 */}
+          {!renderCollapseControls && ((leftSidebar && leftCollapsible) || (rightSidebar && rightCollapsible)) && (
             <div
               style={{
                 minHeight: '40px',
@@ -135,48 +197,14 @@ export default function ThreeColumnLayout({
                 alignItems: 'center',
                 justifyContent: 'space-between',
                 padding: `0 ${designSystem.spacing[2]}`,
-                borderBottom: `1px solid ${designSystem.semantic.surface.border}`,
+                backgroundColor: designSystem.semantic.surface.base,
               }}
             >
               {/* 左侧折叠按钮 */}
-              {leftSidebar && leftCollapsible ? (
-                <Tooltip
-                  title={leftCollapsed ? '展开左侧边栏' : '折叠左侧边栏'}
-                  placement="right"
-                  open={leftTooltipOpen}
-                  onOpenChange={setLeftTooltipOpen}
-                >
-                  <Button
-                    type="text"
-                    size="small"
-                    icon={leftCollapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-                    onClick={() => {
-                      setLeftCollapsed(!leftCollapsed);
-                      setLeftTooltipOpen(false);
-                    }}
-                  />
-                </Tooltip>
-              ) : <div />}
+              {leftButton || <div />}
 
               {/* 右侧折叠按钮 */}
-              {rightSidebar && rightCollapsible ? (
-                <Tooltip
-                  title={rightCollapsed ? '展开右侧边栏' : '折叠右侧边栏'}
-                  placement="left"
-                  open={rightTooltipOpen}
-                  onOpenChange={setRightTooltipOpen}
-                >
-                  <Button
-                    type="text"
-                    size="small"
-                    icon={rightCollapsed ? <MenuFoldOutlined /> : <MenuUnfoldOutlined />}
-                    onClick={() => {
-                      setRightCollapsed(!rightCollapsed);
-                      setRightTooltipOpen(false);
-                    }}
-                  />
-                </Tooltip>
-              ) : <div />}
+              {rightButton || <div />}
             </div>
           )}
 
@@ -192,7 +220,7 @@ export default function ThreeColumnLayout({
               maxWidth: '350px',
               flexShrink: 1,
               flexGrow: 0,
-              borderLeft: `1px solid ${designSystem.semantic.surface.border}`,
+              backgroundColor: designSystem.semantic.surface.base,
               display: 'flex',
               flexDirection: 'column',
               overflow: 'hidden',
@@ -210,12 +238,13 @@ export default function ThreeColumnLayout({
         <div
           style={{
             flexShrink: 0,
-            borderTop: `1px solid ${designSystem.semantic.surface.border}`,
+            boxShadow: '0 -1px 2px 0 rgba(0, 0, 0, 0.05)',
             display: 'flex',
             alignItems: 'center',
-            padding: designSystem.spacing[3],
+            padding: designSystem.spacing[1],  // 8px 最紧凑布局
             fontSize: designSystem.typography.fontSize.sm,
-            gap: designSystem.spacing[4],
+            gap: designSystem.spacing[1],  // 8px
+            backgroundColor: designSystem.semantic.surface.base,
           }}
         >
           {bottomBar}

@@ -148,7 +148,9 @@ export default function DetailPage() {
     <div style={{
       padding: designSystem.spacing[6],
       maxWidth: '1200px',
-      margin: '0 auto'
+      margin: '0 auto',
+      minHeight: '100%',
+      background: designSystem.semantic.surface.base,
     }}>
       {/* 顶部操作栏 */}
       <div style={{ marginBottom: designSystem.spacing[6] }}>

@@ -74,7 +74,6 @@ export const textStyles = {
   subheading: {
     fontSize: designSystem.typography.fontSize.lg,
     fontWeight: designSystem.typography.fontWeight.semibold,
-    opacity: 0.85,
     lineHeight: designSystem.typography.lineHeight.normal,
   } as CSSProperties,
 
@@ -88,78 +87,19 @@ export const textStyles = {
   // 小字（次要文字）
   small: {
     fontSize: designSystem.typography.fontSize.sm,
-    opacity: 0.65,
   } as CSSProperties,
 
   // 提示文字（辅助文字）
   hint: {
     fontSize: designSystem.typography.fontSize.xs,
-    opacity: 0.45,
-  } as CSSProperties,
-
-  // 文字颜色层级（使用 opacity 自动适配主题）
-  primary: {} as CSSProperties,  // 主文字，继承默认
-  secondary: { opacity: 0.65 } as CSSProperties,  // 次要文字
-  tertiary: { opacity: 0.45 } as CSSProperties,   // 辅助文字
-};
-
-/**
- * 卡片样式
- */
-export const cardStyles = {
-  default: {
-    background: designSystem.semantic.surface.primary,
-    border: `1px solid ${designSystem.semantic.surface.border}`,
-    borderRadius: designSystem.borderRadius.md,
-    padding: designSystem.spacing[4],
-  } as CSSProperties,
-
-  hover: {
-    background: designSystem.semantic.surface.primary,
-    border: `1px solid ${designSystem.semantic.surface.border}`,
-    borderRadius: designSystem.borderRadius.md,
-    padding: designSystem.spacing[4],
-    cursor: 'pointer',
-    transition: 'all 0.3s ease',
   } as CSSProperties,
 };
 
 /**
- * 阴影样式
+ * 页面容器样式
  */
-export const shadowStyles = {
-  sm: {
-    boxShadow: designSystem.shadows.sm,
-  } as CSSProperties,
-
-  md: {
-    boxShadow: designSystem.shadows.md,
-  } as CSSProperties,
-
-  lg: {
-    boxShadow: designSystem.shadows.lg,
-  } as CSSProperties,
-
-  xl: {
-    boxShadow: designSystem.shadows.xl,
-  } as CSSProperties,
-};
-
-/**
- * 滚动条样式
- */
-export const scrollbarStyles = {
-  thin: {
-    '&::-webkit-scrollbar': {
-      width: '6px',
-      height: '6px',
-    },
-    '&::-webkit-scrollbar-thumb': {
-      background: designSystem.semantic.surface.divider,
-      borderRadius: designSystem.borderRadius.full,
-    },
-    '&::-webkit-scrollbar-track': {
-      background: 'transparent',
-    },
-  },
-};
+export const pageContainer = {
+  background: designSystem.cardSystem.pageBackground,
+  minHeight: '100vh',
+  padding: designSystem.spacing[6],
+} as CSSProperties;

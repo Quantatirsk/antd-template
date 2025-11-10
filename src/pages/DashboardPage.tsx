@@ -111,7 +111,9 @@ export default function DashboardPage() {
     <div style={{
       padding: designSystem.spacing[6],
       maxWidth: '1400px',
-      margin: '0 auto'
+      margin: '0 auto',
+      minHeight: '100%',
+      background: designSystem.semantic.surface.base,
     }}>
       {/* 标题 */}
       <h1 style={{ fontSize: designSystem.typography.fontSize['3xl'], fontWeight: designSystem.typography.fontWeight.bold, marginBottom: designSystem.spacing[6] }}>
