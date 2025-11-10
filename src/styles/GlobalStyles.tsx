@@ -70,13 +70,13 @@ export function GlobalStyles() {
     }
 
     .ant-card-actions > li {
-      margin: ${designSystem.spacing[0.75]} 0;  /* 上下各6px，总高度约28px */
+      margin: ${designSystem.spacing[0.5]} 0 !important;  /* 上下各2px，极致紧凑 */
       padding: 0;
     }
 
     .ant-card-actions > li > span {
       font-size: ${designSystem.componentFontSize.button} !important;  /* 13px - 保留覆盖默认字体 */
-      line-height: 1.2;  /* 紧凑行高 */
+      line-height: 1.2;
       padding: 0;
       display: inline-flex;
       align-items: center;
@@ -84,7 +84,7 @@ export function GlobalStyles() {
     }
 
     .ant-card-actions > li > span > .anticon {
-      font-size: ${designSystem.iconSizes.base} !important;  /* 图标稍大保持可点击性 */
+      font-size: ${designSystem.iconSizes.xs} !important;  /* 12px - 精致小图标 */
     }
 
     /* Table容器卡片样式 - 统一Table组件外观 */

@@ -156,16 +156,16 @@ export const typography = {
   },
 } as const;
 
-// ==================== 圆角系统（Apple级现代设计）====================
+// ==================== 圆角系统（紧凑精致设计）====================
 
 export const borderRadius = {
   none: '0',
-  sm: '4px',    // 小元素（Tag、Badge）
-  md: '6px',    // 标准按钮、输入框
-  lg: '10px',   // 卡片（从8px增加，更现代）
-  xl: '14px',   // Modal、Sheet
-  '2xl': '20px', // 大卡片、面板（新增）
-  '3xl': '28px', // Hero区域（新增）
+  sm: '2px',    // 小元素（Tag、Badge）
+  md: '4px',    // 标准按钮、输入框
+  lg: '6px',    // 卡片
+  xl: '8px',    // Modal、Sheet
+  '2xl': '12px', // 大卡片、面板
+  '3xl': '16px', // Hero区域
   full: '9999px', // 圆形
 } as const;
 
@@ -194,7 +194,7 @@ export const cardSystem = {
   borderRadius: borderRadius.lg,  // 10px
 
   // 卡片尺寸
-  minWidth: '300px',              // 卡片最小宽度（用于 grid 布局）
+  minWidth: '240px',              // 卡片最小宽度（用于 grid 布局）
 
   // 卡片背景色
   background: colors.neutral[0],   // 纯白
@@ -210,7 +210,7 @@ export const cardSystem = {
   paddingCompact: spacing[3],      // 16px（紧凑卡片）
 
   // 元素间距
-  gap: spacing[3],                 // 16px（从12px增加）
+  gap: spacing[3],                 // 16px
   gapSmall: spacing[2],           // 12px（紧凑元素）
 
   // 卡片外边距

@@ -18,10 +18,10 @@ function App() {
           colorLink: designSystem.colors.primary[500],
           colorLinkHover: designSystem.colors.primary[600],
 
-          // 全局圆角（Apple级）
-          borderRadius: 6,        // 按钮、输入框
-          borderRadiusLG: 10,     // 卡片
-          borderRadiusSM: 4,      // 小元素
+          // 全局圆角（从 design-system 统一配置）
+          borderRadius: parseInt(designSystem.borderRadius.md),      // 4px - 按钮、输入框、菜单
+          borderRadiusLG: parseInt(designSystem.borderRadius.lg),    // 6px - 卡片
+          borderRadiusSM: parseInt(designSystem.borderRadius.sm),    // 2px - 小元素
 
           // 字号（从 design-system 统一配置）
           fontSize: parseInt(designSystem.componentFontSize.global),  // 13px - 全局基础字号
