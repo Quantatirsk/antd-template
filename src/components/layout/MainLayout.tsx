@@ -40,6 +40,13 @@ export default function MainLayout() {
     // 注意：窗口变宽时不自动展开，用户需要手动展开
   }, [isWideEnough]);
 
+  // 点击内容区自动折叠侧边栏
+  const handleContentClick = () => {
+    if (!collapsed) {
+      setCollapsed(true);
+    }
+  };
+
   // 菜单项配置
   const menuItems = [
     {
@@ -201,6 +208,7 @@ export default function MainLayout() {
         </Header>
 
         <Content
+          onClick={handleContentClick}
           style={{
             height: `calc(100vh - ${designSystem.heights.header})`,
             overflow: 'auto',

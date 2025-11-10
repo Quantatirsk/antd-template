@@ -12,7 +12,7 @@
 import { useState, useMemo } from 'react';
 import { Input, Select, Button, Table, Card, Tag, Space, Modal, Form, message, Radio, Checkbox } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined, ExportOutlined, AppstoreOutlined, UnorderedListOutlined, MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
-import ThreeColumnLayout from '@/components/layout/ThreeColumnLayout';
+import PageLayout from '@/components/layout/PageLayout';
 import { LoadingState, EmptyState } from '@/components/Common';
 import { designSystem } from '@/styles';
 import type { ColumnsType } from 'antd/es/table';
@@ -296,7 +296,7 @@ export default function ListPage() {
 
   // 左侧筛选面板
   const leftSidebar = (
-    <div style={{ padding: designSystem.spacing[1] }}>  {/* 8px 最紧凑布局 */}
+    <>
       {/* 类型筛选卡片 */}
       <Card
         size="small"
@@ -342,12 +342,12 @@ export default function ListPage() {
           <div>草稿: {data.filter(d => d.status === 'draft').length}</div>
         </div>
       </Card>
-    </div>
+    </>
   );
 
   // 右侧详情面板
   const rightSidebar = (
-    <div style={{ padding: designSystem.spacing[1] }}>  {/* 8px 最紧凑布局 */}
+    <>
       {selectedItem ? (
         <>
           <Card size="small" title="详情" style={{ marginBottom: designSystem.spacing[1], borderRadius: designSystem.borderRadius.lg }}>  {/* 8px */}
@@ -392,7 +392,7 @@ export default function ListPage() {
           点击列表项查看详情
         </div>
       )}
-    </div>
+    </>
   );
 
   // 底部状态栏（带侧栏控制按钮）
@@ -448,7 +448,7 @@ export default function ListPage() {
   // ==================== 渲染 ====================
   return (
     <>
-      <ThreeColumnLayout
+      <PageLayout
         topBar={topBar}
         leftSidebar={leftSidebar}
         leftDefaultCollapsed={leftCollapsed}
@@ -542,7 +542,7 @@ export default function ListPage() {
             </div>
           )}
         </div>
-      </ThreeColumnLayout>
+      </PageLayout>
 
       {/* 创建 Modal */}
       <Modal

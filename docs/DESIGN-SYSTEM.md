@@ -1,376 +1,438 @@
-# 设计系统文档
+# 设计系统
 
 ## 概述
 
-本设计系统基于 4px 网格系统，提供完整的设计令牌（Design Tokens），确保 UI 的一致性和可维护性。
+本设计系统基于 **8px 网格系统**（Apple iOS 标准），提供统一、专业的视觉语言。所有设计 tokens 都集中在 `src/styles/design-system.ts` 中，避免硬编码，确保一致性。
 
-## 设计令牌（Design Tokens）
+## 设计原则
 
-设计令牌是设计系统的最小单元，包括颜色、间距、字体等视觉属性。
+1. **一致性优先**：所有样式值从 designSystem 引用，禁止硬编码
+2. **语义化命名**：使用 `semantic.text.primary` 而不是 `colors.neutral[900]`
+3. **响应式优先**：所有布局支持响应式，自动适配设备
+4. **可访问性**：符合 WCAG 2.1 标准，最小触控目标 44px
 
-### 导入
+## 核心系统
+
+### 1. 颜色系统
+
+#### 主色（Primary）
+基于 `#005BAC`，提供 10 级色阶：
+
+```typescript
+colors.primary = {
+  50: '#E6F0F9',   // 最浅
+  100: '#B3D4ED',
+  200: '#80B8E0',
+  300: '#4D9CD4',
+  400: '#2680C7',
+  500: '#005BAC',  // 主色 ★
+  600: '#004F96',
+  700: '#004380',
+  800: '#00376A',
+  900: '#002B54',  // 最深
+}
+```
+
+#### 中性色（Neutral）
+Apple 级 7 级精简系统：
+
+```typescript
+colors.neutral = {
+  0: '#FFFFFF',    // 纯白 - 卡片、面板
+  50: '#F5F5F7',   // Apple Gray - 页面背景
+  100: '#E8E8ED',  // 分隔线、禁用背景
+  200: '#D1D1D6',  // 边框、次要分隔
+  400: '#8E8E93',  // 次要文字、图标
+  600: '#48484A',  // 正文、主要图标
+  900: '#1C1C1E',  // 标题、强调文字
+}
+```
+
+#### 功能色
+```typescript
+colors.success = '#10B981'  // 成功/绿色
+colors.warning = '#F59E0B'  // 警告/黄色
+colors.error = '#EF4444'    // 错误/红色
+colors.info = '#2680C7'     // 信息/蓝色
+```
+
+### 2. 语义化颜色
+
+**推荐使用语义化颜色，而不是直接引用 colors**：
+
+#### Surface（表面）
+```typescript
+semantic.surface.base = colors.neutral[0]         // 卡片、面板
+semantic.surface.background = colors.neutral[50]  // 页面背景
+semantic.surface.elevated = colors.neutral[0]     // Modal、Popover
+semantic.surface.overlay = 'rgba(0, 0, 0, 0.4)'  // 蒙层
+```
+
+#### Border（边框）
+```typescript
+semantic.border.light = colors.neutral[100]   // 浅色边框
+semantic.border.medium = colors.neutral[200]  // 标准边框
+```
+
+#### Text（文字）
+```typescript
+semantic.text.primary = colors.neutral[900]    // 标题、主要内容
+semantic.text.secondary = colors.neutral[600]  // 正文、次要内容
+semantic.text.tertiary = colors.neutral[400]   // 辅助文字
+semantic.text.inverse = colors.neutral[0]      // 反色文字
+```
+
+#### Interactive（交互）
+```typescript
+semantic.interactive.primary = colors.primary[500]      // 主按钮
+semantic.interactive.primaryHover = colors.primary[600] // 主按钮悬停
+```
+
+### 3. 间距系统（8px 网格）
+
+所有间距都基于 8px 的倍数：
+
+```typescript
+spacing = {
+  0: '0',
+  0.25: '2px',   // 微小间距（标签内部）
+  0.5: '4px',    // 极小间距（图标与文字）
+  1: '8px',      // ★ 最小间距（列表内元素）
+  2: '12px',     // 紧凑间距（标签）
+  3: '16px',     // 标准间距（卡片内元素）
+  4: '20px',     // 舒适间距（卡片 padding）
+  5: '24px',     // 大间距（卡片之间）
+  6: '32px',     // 区域间距（section 之间）
+  8: '40px',     // 大区域间距
+  10: '48px',    // 超大区域间距
+  12: '64px',    // 页面级间距
+}
+```
+
+**使用示例**：
+```typescript
+// ✅ 正确
+marginBottom: designSystem.spacing[3]  // 16px
+
+// ❌ 错误
+marginBottom: '16px'  // 硬编码
+```
+
+### 4. 字体系统
+
+#### 字号（专业工具类网站 - 紧凑统一）
+```typescript
+typography.fontSize = {
+  xs: '11px',    // 极小文字（脚注）
+  sm: '12px',    // 辅助信息（Tag、Badge）
+  base: '13px',  // ★ 核心字号（表格、按钮、表单）
+  md: '15px',    // 正文（长文阅读）
+  lg: '20px',    // Title 3
+  xl: '22px',    // Title 2
+  '2xl': '28px', // Title 1
+  '3xl': '34px', // Large Title
+}
+```
+
+#### 字重
+```typescript
+typography.fontWeight = {
+  light: 300,    // 轻字重
+  normal: 400,   // Regular
+  medium: 500,   // Medium
+  semibold: 600, // Semibold ★ 标题常用
+  bold: 700,     // Bold
+}
+```
+
+#### 行高
+```typescript
+typography.lineHeight = {
+  tight: 1.2,      // 大标题
+  snug: 1.375,     // 副标题、按钮
+  normal: 1.5,     // ★ 正文
+  relaxed: 1.625,  // 长文阅读
+}
+```
+
+### 5. 圆角系统
+
+```typescript
+borderRadius = {
+  none: '0',
+  sm: '2px',    // Tag、Badge
+  md: '4px',    // 按钮、输入框
+  lg: '6px',    // ★ 卡片（推荐）
+  xl: '8px',    // Modal、Sheet
+  '2xl': '12px', // 大卡片
+  full: '9999px', // 圆形
+}
+```
+
+### 6. 阴影系统
+
+Apple 级多层叠加：
+
+```typescript
+shadows = {
+  xs: '0 1px 2px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04)',
+  sm: '0 2px 8px rgba(0, 0, 0, 0.08), 0 1px 4px rgba(0, 0, 0, 0.04)',
+  md: '0 4px 16px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06)',
+  lg: '0 8px 24px rgba(0, 0, 0, 0.15), 0 4px 12px rgba(0, 0, 0, 0.08)',
+  xl: '0 16px 48px rgba(0, 0, 0, 0.18), 0 8px 24px rgba(0, 0, 0, 0.10)',
+
+  // 特殊
+  inner: 'inset 0 2px 4px 0 rgba(0, 0, 0, 0.06)',
+  focus: '0 0 0 4px rgba(0, 91, 172, 0.15)',
+}
+```
+
+## 组件系统
+
+### 卡片系统（cardSystem）
+
+```typescript
+cardSystem = {
+  borderRadius: borderRadius.lg,    // 6px
+  background: colors.neutral[0],     // 白色
+  shadow: shadows.xs,                // 轻量阴影
+  shadowHover: shadows.sm,           // 悬停阴影
+  padding: spacing[4],               // 20px
+  paddingLarge: spacing[5],          // 24px（大卡片）
+  paddingCompact: spacing[3],        // 16px（紧凑）
+  gap: spacing[3],                   // 元素间距 16px
+  pageBackground: colors.neutral[50], // 页面背景
+}
+```
+
+**使用示例**：
+```tsx
+<Card
+  size="small"
+  style={{
+    borderRadius: designSystem.borderRadius.lg,
+    marginBottom: designSystem.spacing[1],
+  }}
+>
+  内容
+</Card>
+```
+
+### 表格系统（tableSystem）
+
+```typescript
+tableSystem = {
+  containerBorderRadius: borderRadius.lg,
+  containerBackground: colors.neutral[0],
+  containerShadow: shadows.sm,
+  rowHoverBackground: colors.neutral[50],
+  headerBackground: colors.neutral[0],
+  borderColor: colors.neutral[100],
+}
+```
+
+### 侧边栏系统（sidebarSystem）
+
+```typescript
+sidebarSystem = {
+  leftWidth: '255px',
+  leftMinWidth: '225px',
+  leftMaxWidth: '285px',
+  rightWidth: '270px',
+  rightMinWidth: '240px',
+  rightMaxWidth: '300px',
+  collapsedWidth: '56px',
+  autoCollapseBreakpoint: breakpoints.threeColumn, // 900px
+}
+```
+
+## 响应式断点
+
+```typescript
+breakpoints = {
+  mobile: '640px',      // 手机
+  tablet: '768px',      // 平板
+  threeColumn: '900px', // ★ PageLayout 自动折叠
+  laptop: '1024px',     // ★ MainLayout 自动折叠
+  desktop: '1280px',    // 桌面
+  wide: '1536px',       // 宽屏
+}
+```
+
+## 动画与过渡
+
+### 时长
+```typescript
+transitions.duration = {
+  instant: '100ms',  // 即时反馈
+  fast: '150ms',     // ★ 快速动画（推荐）
+  base: '200ms',     // 标准动画
+  slow: '300ms',     // 慢动画
+  slower: '500ms',   // 特殊效果
+}
+```
+
+### 缓动函数
+```typescript
+transitions.easing = {
+  linear: 'linear',
+  ease: 'cubic-bezier(0.4, 0, 0.2, 1)',  // ★ 标准（推荐）
+  easeIn: 'cubic-bezier(0.4, 0, 1, 1)',
+  easeOut: 'cubic-bezier(0, 0, 0.2, 1)',
+  spring: 'cubic-bezier(0.34, 1.56, 0.64, 1)',
+}
+```
+
+### 常用组合
+```typescript
+transitions.default = '200ms cubic-bezier(0.4, 0, 0.2, 1)'
+transitions.fast = '150ms cubic-bezier(0.4, 0, 0.2, 1)'
+```
+
+## Z-Index 层级
+
+```typescript
+zIndex = {
+  base: 0,
+  dropdown: 1000,
+  sticky: 1020,
+  fixed: 1030,
+  modalBackdrop: 1040,
+  modal: 1050,
+  popover: 1060,
+  tooltip: 1070,
+}
+```
+
+## 使用指南
+
+### 1. 导入设计系统
 
 ```typescript
 import { designSystem } from '@/styles';
 ```
 
----
+### 2. 引用 Tokens
 
-## 1. 颜色系统
-
-### 1.1 主色调
+**✅ 推荐**：使用语义化名称
 ```typescript
-designSystem.colors.primary[500] // #005BAC
+color: designSystem.semantic.text.primary
+background: designSystem.semantic.surface.base
 ```
 
-10档渐变：`50, 100, 200, 300, 400, 500, 600, 700, 800, 900`
-
-### 1.2 中性色
+**⚠️ 可用**：直接引用系统
 ```typescript
-designSystem.colors.neutral[0]   // #FFFFFF 纯白
-designSystem.colors.neutral[900] // #111827 最深
+color: designSystem.colors.primary[500]
+padding: designSystem.spacing[3]
 ```
 
-11档灰度：`0, 50, 100, 200, 300, 400, 500, 600, 700, 800, 900`
-
-### 1.3 功能色
+**❌ 禁止**：硬编码
 ```typescript
-designSystem.colors.success // #10B981
-designSystem.colors.warning // #F59E0B
-designSystem.colors.error   // #EF4444
-designSystem.colors.info    // #3B82F6
+color: '#1C1C1E'     // ❌
+padding: '16px'      // ❌
 ```
 
-### 1.4 语义化颜色
-```typescript
-// 表面颜色
-designSystem.semantic.surface.primary   // 主背景
-designSystem.semantic.surface.secondary // 次背景
-designSystem.semantic.surface.tertiary  // 工具栏背景
-designSystem.semantic.surface.border    // 边框
-designSystem.semantic.surface.divider   // 分隔线
+### 3. 组件样式示例
 
-// 文字颜色
-designSystem.semantic.text.primary      // 主文字
-designSystem.semantic.text.secondary    // 次要文字
-designSystem.semantic.text.tertiary     // 辅助文字
-designSystem.semantic.text.inverse      // 反色文字
-
-// 交互颜色
-designSystem.semantic.interactive.primary       // 主按钮
-designSystem.semantic.interactive.primaryHover  // 主按钮悬停
+```tsx
+// 标准卡片
+<Card
+  size="small"
+  style={{
+    borderRadius: designSystem.borderRadius.lg,
+    marginBottom: designSystem.spacing[1],
+  }}
+>
+  <div style={{
+    fontSize: designSystem.typography.fontSize.sm,
+    fontWeight: designSystem.typography.fontWeight.semibold,
+    color: designSystem.semantic.text.primary,
+    marginBottom: designSystem.spacing[1],
+  }}>
+    标题
+  </div>
+  <div style={{
+    fontSize: designSystem.typography.fontSize.sm,
+    color: designSystem.semantic.text.secondary,
+  }}>
+    内容
+  </div>
+</Card>
 ```
 
----
+### 4. 按钮尺寸指南
 
-## 2. 间距系统
+在不同场景使用不同尺寸：
 
-### 2.1 基准：4px
+```tsx
+// 主要操作按钮：默认大小（无需设置 size）
+<Button type="primary" icon={<PlusOutlined />}>
+  新建
+</Button>
 
-```typescript
-designSystem.spacing[0]  // 0
-designSystem.spacing[1]  // 4px
-designSystem.spacing[2]  // 8px
-designSystem.spacing[3]  // 12px
-designSystem.spacing[4]  // 16px  ⭐ 标准间距
-designSystem.spacing[6]  // 24px  ⭐ 卡片间距
-designSystem.spacing[8]  // 32px  ⭐ 区域间距
+// 辅助操作按钮：小尺寸
+<Button size="small">取消</Button>
+
+// 表格内操作按钮：链接 + 小尺寸
+<Button type="link" size="small">编辑</Button>
 ```
 
-### 2.2 使用示例
+### 5. 间距使用指南
 
 ```typescript
-// 内边距
-<div style={{ padding: designSystem.spacing[4] }}>
+// 卡片之间
+marginBottom: designSystem.spacing[1]  // 8px（紧凑布局）
 
-// 外边距
-<div style={{ marginBottom: designSystem.spacing[6] }}>
+// 卡片内元素
+marginBottom: designSystem.spacing[1]  // 8px
 
-// Flex 间距
-<div style={{ gap: designSystem.spacing[3] }}>
+// Section 之间
+marginBottom: designSystem.spacing[2]  // 12px
+
+// 页面级间距
+padding: designSystem.spacing[1]       // 8px
 ```
 
----
+## 自定义主题
 
-## 3. 高度系统
+### 修改主色
 
-### 3.1 固定高度
-
-```typescript
-designSystem.heights.header     // 56px  主标题栏
-designSystem.heights.toolbar    // 40px  工具栏
-designSystem.heights.inputMd    // 32px  标准输入框
-designSystem.heights.buttonMd   // 32px  标准按钮
-designSystem.heights.statusBar  // 24px  状态栏
-```
-
-### 3.2 使用示例
+编辑 `src/styles/design-system.ts`：
 
 ```typescript
-// 工具栏
-<div style={{ height: designSystem.heights.toolbar }}>
-```
-
----
-
-## 4. 字体系统
-
-### 4.1 字号
-
-```typescript
-designSystem.typography.fontSize.xs    // 12px
-designSystem.typography.fontSize.sm    // 14px
-designSystem.typography.fontSize.base  // 16px ⭐ 默认
-designSystem.typography.fontSize['2xl'] // 24px
-```
-
-### 4.2 字重
-
-```typescript
-designSystem.typography.fontWeight.normal   // 400 正文
-designSystem.typography.fontWeight.medium   // 500 强调
-designSystem.typography.fontWeight.semibold // 600 副标题
-designSystem.typography.fontWeight.bold     // 700 标题
-```
-
-### 4.3 行高
-
-```typescript
-designSystem.typography.lineHeight.tight   // 1.25 标题
-designSystem.typography.lineHeight.normal  // 1.5  正文
-designSystem.typography.lineHeight.relaxed // 1.75 阅读
-```
-
-### 4.4 字体族
-
-```typescript
-designSystem.typography.fontFamily.sans // 系统字体
-designSystem.typography.fontFamily.mono // 等宽字体
-```
-
-### 4.5 使用示例
-
-```typescript
-// 标题样式
-<h1 style={{
-  fontSize: designSystem.typography.fontSize['2xl'],
-  fontWeight: designSystem.typography.fontWeight.bold,
-  color: designSystem.semantic.text.primary,
-}}>
-
-// 正文样式
-<p style={{
-  fontSize: designSystem.typography.fontSize.base,
-  lineHeight: designSystem.typography.lineHeight.normal,
-  color: designSystem.semantic.text.secondary,
-}}>
-```
-
----
-
-## 5. 圆角系统
-
-```typescript
-designSystem.borderRadius.none // 0
-designSystem.borderRadius.sm   // 4px
-designSystem.borderRadius.md   // 8px  ⭐ 默认
-designSystem.borderRadius.lg   // 12px
-designSystem.borderRadius.full // 9999px 完全圆角
-```
-
-使用示例：
-```typescript
-<div style={{ borderRadius: designSystem.borderRadius.md }}>
-```
-
----
-
-## 6. 阴影系统
-
-```typescript
-designSystem.shadows.none // none
-designSystem.shadows.sm   // 轻微投影
-designSystem.shadows.md   // 卡片投影
-designSystem.shadows.lg   // 弹出层投影
-designSystem.shadows.xl   // 模态框投影
-```
-
-使用示例：
-```typescript
-<div style={{ boxShadow: designSystem.shadows.md }}>
-```
-
----
-
-## 7. 断点系统
-
-```typescript
-designSystem.breakpoints.mobile  // 640px
-designSystem.breakpoints.tablet  // 768px
-designSystem.breakpoints.laptop  // 1024px
-designSystem.breakpoints.desktop // 1280px
-designSystem.breakpoints.wide    // 1536px
-```
-
-使用示例：
-```typescript
-@media (min-width: ${designSystem.breakpoints.laptop}) {
-  /* 笔记本及以上 */
+export const colors = {
+  primary: {
+    // ... 修改主色色阶
+    500: '#YOUR_COLOR', // 主色
+  },
 }
 ```
 
----
-
-## 8. Z-Index 层级
+### 修改字号
 
 ```typescript
-designSystem.zIndex.dropdown      // 1000
-designSystem.zIndex.sticky        // 1020
-designSystem.zIndex.fixed         // 1030
-designSystem.zIndex.modalBackdrop // 1040
-designSystem.zIndex.modal         // 1050
-designSystem.zIndex.popover       // 1060
-designSystem.zIndex.tooltip       // 1070
+export const typography = {
+  fontSize: {
+    base: '14px',  // 将核心字号改为 14px
+    // ...
+  },
+}
 ```
 
----
-
-## 9. 通用样式工具
-
-除了设计令牌，我们还提供了通用样式工具 `common-styles.ts`。
-
-### 9.1 Flex 布局
+### 修改间距
 
 ```typescript
-import { flexStyles } from '@/styles';
-
-// 水平居中
-<div style={flexStyles.centerX}>
-
-// 垂直居中
-<div style={flexStyles.centerY}>
-
-// 完全居中
-<div style={flexStyles.center}>
-
-// 两端对齐
-<div style={flexStyles.spaceBetween}>
-
-// 列布局
-<div style={flexStyles.column}>
-```
-
-### 9.2 文本样式
-
-```typescript
-import { textStyles } from '@/styles';
-
-// 单行截断
-<div style={textStyles.ellipsis}>
-
-// 多行截断
-<div style={textStyles.ellipsisMultiline(3)}>
-
-// 标题
-<h1 style={textStyles.heading}>
-
-// 正文
-<p style={textStyles.body}>
-```
-
-### 9.3 卡片样式
-
-```typescript
-import { cardStyles } from '@/styles';
-
-// 默认卡片
-<div style={cardStyles.default}>
-
-// 可悬停卡片
-<div style={cardStyles.hover}>
-```
-
----
-
-## 10. 最佳实践
-
-### 10.1 优先使用语义化颜色
-
-```typescript
-// ✅ 推荐
-color: designSystem.semantic.text.primary
-
-// ❌ 不推荐
-color: designSystem.colors.neutral[900]
-```
-
-**原因**：语义化颜色易于理解和维护，支持主题切换。
-
-### 10.2 使用设计令牌替代硬编码
-
-```typescript
-// ✅ 推荐
-padding: designSystem.spacing[4]
-
-// ❌ 不推荐
-padding: '16px'
-```
-
-**原因**：设计令牌保证一致性，易于全局调整。
-
-### 10.3 遵循 4px 网格系统
-
-```typescript
-// ✅ 推荐
-width: '240px'  // 60 × 4px
-
-// ❌ 不推荐
-width: '235px'  // 不是 4 的倍数
-```
-
-**原因**：保持视觉节奏一致，避免次像素渲染。
-
-### 10.4 使用通用样式工具
-
-```typescript
-// ✅ 推荐
-import { flexStyles } from '@/styles';
-<div style={flexStyles.center}>
-
-// ❌ 不推荐
-<div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-```
-
-**原因**：减少重复代码，保持一致性。
-
----
-
-## 11. 扩展设计系统
-
-如需扩展设计系统，请修改 `src/styles/design-system.ts`：
-
-```typescript
-export const customTokens = {
-  // 自定义令牌
-  myColor: '#FF5733',
-};
-
-export const designSystem = {
-  colors,
-  semantic,
-  spacing,
+export const spacing = {
+  1: '10px',  // 将最小间距改为 10px
   // ...
-  custom: customTokens,
-};
+}
 ```
 
----
+## 与 Ant Design 集成
 
-## 12. 主题化支持
+在 `App.tsx` 中配置：
 
-本设计系统支持主题化扩展，可通过 Ant Design 的 `ConfigProvider` 实现：
-
-```typescript
+```tsx
 import { ConfigProvider } from 'antd';
 import { designSystem } from '@/styles';
 
@@ -378,8 +440,16 @@ import { designSystem } from '@/styles';
   theme={{
     token: {
       colorPrimary: designSystem.colors.primary[500],
+      fontSize: parseInt(designSystem.componentFontSize.global),
       borderRadius: parseInt(designSystem.borderRadius.md),
-      fontSize: parseInt(designSystem.typography.fontSize.base),
+      controlHeight: parseInt(designSystem.heights.inputMd),
+    },
+    components: {
+      Table: {
+        headerBg: designSystem.tableSystem.headerBackground,
+        headerColor: designSystem.semantic.text.primary,
+        fontSize: parseInt(designSystem.componentFontSize.tableCell),
+      },
     },
   }}
 >
@@ -387,10 +457,29 @@ import { designSystem } from '@/styles';
 </ConfigProvider>
 ```
 
----
+## 常见问题
 
-## 参考资源
+### Q: 为什么要用 designSystem 而不是直接写值？
+A:
+1. 保证全局一致性
+2. 支持主题切换
+3. 便于维护和批量修改
+4. 提高代码可读性
 
-- [Ant Design 设计语言](https://ant.design/docs/spec/introduce-cn)
-- [Material Design 色彩系统](https://material.io/design/color)
-- [Tailwind CSS 设计系统](https://tailwindcss.com/docs/customizing-colors)
+### Q: 什么时候用 semantic，什么时候用 colors？
+A:
+- **优先使用 semantic**：文字颜色、背景色等语义明确的场景
+- **使用 colors**：需要特定色阶或特殊颜色时
+
+### Q: 如何确保响应式？
+A:
+使用 `useMediaQuery` hook 和 breakpoints：
+```typescript
+const isMobile = useMediaQuery(`(max-width: ${designSystem.breakpoints.mobile})`);
+```
+
+## 下一步
+
+- 阅读 [布局系统](./LAYOUT-SYSTEM.md) 了解如何使用布局组件
+- 阅读 [页面模板](./PAGE-TEMPLATES.md) 学习页面开发
+- 阅读 [最佳实践](./BEST-PRACTICES.md) 掌握编码规范

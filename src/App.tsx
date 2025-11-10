@@ -29,7 +29,7 @@ function App() {
           fontSizeHeading2: parseInt(designSystem.typography.fontSize.xl),      // 22px
           fontSizeHeading3: parseInt(designSystem.typography.fontSize.lg),      // 20px
         },
-        // 所有组件样式通过 GlobalStyles 统一控制
+        // 组件级样式覆盖通过 GlobalStyles 组件统一控制
       }}
       >
         <RouterProvider router={router} />

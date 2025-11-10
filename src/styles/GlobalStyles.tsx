@@ -44,10 +44,10 @@ export function GlobalStyles() {
       background: transparent;  /* 滚动条交角透明 */
     }
 
-    /* 全局卡片样式 - Apple级现代设计 */
+    /* 全局卡片样式 - 轻量边框 + 阴影设计 */
     /* 配置来源: designSystem.cardSystem */
     .ant-card {
-      border: none !important;
+      border: 1px solid ${designSystem.semantic.border.light} !important;
       box-shadow: ${designSystem.cardSystem.shadow} !important;
       border-radius: ${designSystem.cardSystem.borderRadius} !important;
       transition: box-shadow ${designSystem.transitions.default}, transform ${designSystem.transitions.default} !important;
@@ -267,6 +267,48 @@ export function GlobalStyles() {
     .ant-menu-item,
     .ant-menu-submenu-title {
       font-size: ${designSystem.componentFontSize.menu} !important;
+      padding-inline: ${designSystem.spacing[3]} !important;  /* 16px - 左右内边距 */
+    }
+
+    /* ==================== 无障碍支持（WCAG 2.1）==================== */
+
+    /* 焦点样式 - 确保键盘用户能清晰看到焦点 */
+    button:focus-visible,
+    a:focus-visible,
+    [tabindex]:focus-visible {
+      outline: none;
+      box-shadow: ${designSystem.a11y.focusRingStyle};
+      outline-offset: ${designSystem.a11y.focusRingOffset};
+    }
+
+    /* 移除鼠标点击时的焦点环（但保留键盘焦点环） */
+    button:focus:not(:focus-visible),
+    a:focus:not(:focus-visible) {
+      outline: none;
+      box-shadow: none;
+    }
+
+    /* ==================== 尊重用户动画偏好 ==================== */
+
+    /* 为禁用动画的用户提供极短时长 */
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: ${designSystem.a11y.reducedMotionDuration} !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: ${designSystem.a11y.reducedMotionDuration} !important;
+        scroll-behavior: auto !important;
+      }
+    }
+
+    /* ==================== 平滑滚动（优先级较低）==================== */
+
+    /* 仅在用户未禁用动画时启用平滑滚动 */
+    @media (prefers-reduced-motion: no-preference) {
+      html {
+        scroll-behavior: smooth;
+      }
     }
   `;
 

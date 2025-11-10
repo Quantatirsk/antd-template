@@ -5,7 +5,7 @@
 ## 特性
 
 - ✅ **完整的设计系统**：基于 4px 网格的设计令牌（Design Tokens）
-- ✅ **布局组件库**：ThreeColumnLayout 等可复用布局组件
+- ✅ **布局组件库**：PageLayout 等可复用布局组件
 - ✅ **通用组件库**：LoadingState、ErrorState、EmptyState 等状态组件
 - ✅ **页面模板库**：ListPage、DetailPage、DashboardPage 等完整页面模板
 - ✅ **API 集成模式**：BaseService 继承式 API 设计
@@ -66,7 +66,7 @@ npm run type-check
 │   │   │   └── index.ts
 │   │   │
 │   │   └── layout/              # 布局组件
-│   │       ├── ThreeColumnLayout.tsx
+│   │       ├── PageLayout.tsx
 │   │       └── index.ts
 │   │
 │   ├── hooks/                    # 🪝 自定义 Hooks
@@ -128,21 +128,21 @@ designSystem.typography.fontWeight.bold // 700
 
 ### 2. 布局组件
 
-#### ThreeColumnLayout（三栏布局）
+#### PageLayout（三栏布局）
 
 经典三栏布局，支持顶部工具栏、左右侧边栏、底部状态栏：
 
 ```typescript
-import ThreeColumnLayout from '@/components/layout/ThreeColumnLayout';
+import PageLayout from '@/components/layout/PageLayout';
 
-<ThreeColumnLayout
+<PageLayout
   topBar={<div>工具栏</div>}
   leftSidebar={<div>左侧边栏</div>}
   rightSidebar={<div>右侧边栏</div>}
   bottomBar={<div>状态栏</div>}
 >
   <div>主内容区</div>
-</ThreeColumnLayout>
+</PageLayout>
 ```
 
 详见：[docs/LAYOUT-PATTERNS.md](docs/LAYOUT-PATTERNS.md)

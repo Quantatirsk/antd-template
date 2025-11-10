@@ -1,5 +1,5 @@
 /**
- * ThreeColumnLayout - 经典三栏布局组件
+ * PageLayout - 通用页面布局组件
  *
  * 布局结构：
  * - 顶部工具栏（可选）
@@ -13,7 +13,7 @@ import { useState, useEffect, useRef, ReactNode } from 'react';
 import { designSystem } from '@/styles/design-system';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 
-interface ThreeColumnLayoutProps {
+interface PageLayoutProps {
   // 顶部工具栏
   topBar?: ReactNode;
   topBarHeight?: string;
@@ -21,15 +21,18 @@ interface ThreeColumnLayoutProps {
   // 左侧边栏
   leftSidebar?: ReactNode;
   leftSidebarWidth?: string;
+  leftSidebarPadding?: string;  // 左侧边栏内边距
   leftDefaultCollapsed?: boolean;
   onLeftCollapsedChange?: (collapsed: boolean) => void;
 
   // 主内容区
   children: ReactNode;
+  contentPadding?: string;  // 主内容区内边距
 
   // 右侧边栏
   rightSidebar?: ReactNode;
   rightSidebarWidth?: string;
+  rightSidebarPadding?: string;  // 右侧边栏内边距
   rightDefaultCollapsed?: boolean;
   onRightCollapsedChange?: (collapsed: boolean) => void;
 
@@ -37,20 +40,23 @@ interface ThreeColumnLayoutProps {
   bottomBar?: ReactNode;
 }
 
-export default function ThreeColumnLayout({
+export default function PageLayout({
   topBar,
   topBarHeight = designSystem.heights.toolbar,
   leftSidebar,
   leftSidebarWidth = designSystem.sidebarSystem.leftWidth,
+  leftSidebarPadding = designSystem.spacing[1],  // 默认 8px
   leftDefaultCollapsed = false,
   onLeftCollapsedChange,
   children,
+  contentPadding,  // 主内容区不设置默认 padding，由页面自行控制
   rightSidebar,
   rightSidebarWidth = designSystem.sidebarSystem.rightWidth,
+  rightSidebarPadding = designSystem.spacing[1],  // 默认 8px
   rightDefaultCollapsed = false,
   onRightCollapsedChange,
   bottomBar,
-}: ThreeColumnLayoutProps) {
+}: PageLayoutProps) {
   const [leftCollapsed, setLeftCollapsed] = useState(leftDefaultCollapsed);
   const [rightCollapsed, setRightCollapsed] = useState(rightDefaultCollapsed);
 
@@ -172,14 +178,21 @@ export default function ThreeColumnLayout({
               overflow: 'hidden',
             }}
           >
-            <div style={{ flex: 1, overflow: 'auto' }}>
+            <div style={{ flex: 1, overflow: 'auto', padding: leftSidebarPadding }}>
               {leftSidebar}
             </div>
           </div>
         )}
 
         {/* 主内容区 */}
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, minWidth: 0 }}>
+        <div style={{
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          minHeight: 0,
+          minWidth: 0,
+          ...(contentPadding ? { padding: contentPadding } : {})
+        }}>
           {children}
         </div>
 
@@ -198,7 +211,7 @@ export default function ThreeColumnLayout({
               overflow: 'hidden',
             }}
           >
-            <div style={{ flex: 1, overflow: 'auto' }}>
+            <div style={{ flex: 1, overflow: 'auto', padding: rightSidebarPadding }}>
               {rightSidebar}
             </div>
           </div>

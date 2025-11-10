@@ -199,10 +199,10 @@ export const cardSystem = {
   // 卡片背景色
   background: colors.neutral[0],   // 纯白
 
-  // 卡片阴影（使用新的增强阴影）
-  shadow: shadows.sm,              // 默认：更深的阴影
-  shadowHover: shadows.md,         // 悬停：明显提升
-  shadowElevated: shadows.lg,      // 提升：大幅度分层
+  // 卡片阴影（轻量精致设计）
+  shadow: shadows.xs,              // 默认：轻量阴影
+  shadowHover: shadows.sm,         // 悬停：适度提升
+  shadowElevated: shadows.md,      // 提升：明显分层
 
   // 卡片内边距（增加到20px，大卡片24px）
   padding: spacing[4],             // 20px（从16px增加）
@@ -304,7 +304,7 @@ export const componentFontSize = {
 export const breakpoints = {
   mobile: '640px',
   tablet: '768px',
-  threeColumn: '900px',  // ThreeColumnLayout 自动折叠断点
+  threeColumn: '900px',  // PageLayout 自动折叠断点
   laptop: '1024px',
   desktop: '1280px',
   wide: '1536px',
@@ -344,6 +344,85 @@ export const opacity = {
   overlay: 0.40,     // 蒙层
 } as const;
 
+// ==================== 动画曲线系统（Material Design & Apple 标准）====================
+
+export const easings = {
+  // 标准曲线（Material Design）
+  standard: 'cubic-bezier(0.4, 0, 0.2, 1)',      // 最常用的缓动曲线
+
+  // 分解曲线
+  decelerate: 'cubic-bezier(0.0, 0, 0.2, 1)',    // 减速（元素进入视图）
+  accelerate: 'cubic-bezier(0.4, 0, 1, 1)',      // 加速（元素离开视图）
+  sharp: 'cubic-bezier(0.4, 0, 0.6, 1)',         // 快速敏锐（临时元素）
+
+  // Apple 风格曲线
+  appleEase: 'cubic-bezier(0.25, 0.1, 0.25, 1)', // Apple 经典缓动
+  appleSpring: 'cubic-bezier(0.5, 1.5, 0.5, 1)', // 弹性效果（谨慎使用）
+
+  // 特殊曲线
+  linear: 'linear',                               // 线性（用于颜色/不透明度）
+  easeIn: 'ease-in',                             // 内置缓入
+  easeOut: 'ease-out',                           // 内置缓出
+  easeInOut: 'ease-in-out',                      // 内置缓入缓出
+} as const;
+
+// ==================== 无障碍支持（WCAG 2.1 标准）====================
+
+export const a11y = {
+  // 最小触控目标尺寸（WCAG 2.1 AAA）
+  minTouchTarget: '44px',         // iOS Human Interface Guidelines
+  minTouchTargetWeb: '48px',      // Material Design 推荐
+
+  // 焦点环样式
+  focusRingWidth: '2px',          // 焦点边框宽度
+  focusRingOffset: '2px',         // 焦点边框偏移
+  focusRingColor: colors.primary[500],  // 焦点颜色（使用品牌色）
+  focusRingStyle: `0 0 0 2px ${colors.primary[500]}, 0 0 0 4px ${colors.primary[100]}`,  // 双环焦点样式
+
+  // 色彩对比度（参考值，实际需测试）
+  contrastRatios: {
+    normalText: 4.5,    // WCAG AA 标准（普通文字）
+    largeText: 3.0,     // WCAG AA 标准（大文字 18px+ bold 或 24px+）
+    graphical: 3.0,     // 图形对象和 UI 组件
+  },
+
+  // 动画偏好（尊重用户系统设置）
+  respectReducedMotion: true,  // 标记，配合 CSS prefers-reduced-motion 使用
+  reducedMotionDuration: '0.01ms',  // 为禁用动画的用户提供极短时长
+} as const;
+
+// ==================== 响应式文字缩放（Fluid Typography）====================
+
+export const fluidTypography = {
+  // 视口范围（用于计算 clamp）
+  minViewport: 320,   // 最小视口宽度（px）
+  maxViewport: 1920,  // 最大视口宽度（px）
+
+  // 基础字号缩放范围
+  baseFontSize: {
+    min: 13,  // 移动端基础字号（px）
+    max: 14,  // 桌面端基础字号（px）
+  },
+
+  // 标题字号缩放范围
+  headingScale: {
+    h1: { min: 28, max: 40 },  // Title 1 Large
+    h2: { min: 24, max: 34 },  // Title 1
+    h3: { min: 20, max: 28 },  // Title 2
+    h4: { min: 18, max: 22 },  // Title 3
+    h5: { min: 15, max: 20 },  // Headline
+    h6: { min: 13, max: 16 },  // Subheadline
+  },
+
+  // 生成 CSS clamp 函数的辅助计算
+  // clamp(minSize, minSize + (maxSize - minSize) * ((100vw - minVW) / (maxVW - minVW)), maxSize)
+  generateClamp: (minSize: number, maxSize: number, minVW = 320, maxVW = 1920) => {
+    const slope = (maxSize - minSize) / (maxVW - minVW);
+    const yAxisIntersection = minSize - slope * minVW;
+    return `clamp(${minSize}px, ${yAxisIntersection.toFixed(4)}px + ${(slope * 100).toFixed(4)}vw, ${maxSize}px)`;
+  },
+} as const;
+
 // ==================== 滚动条系统 ====================
 
 export const scrollbarSystem = {
@@ -362,14 +441,14 @@ export const scrollbarSystem = {
 
 export const sidebarSystem = {
   // 左侧栏
-  leftWidth: '240px',
-  leftMinWidth: '200px',
-  leftMaxWidth: '300px',
+  leftWidth: '255px',
+  leftMinWidth: '225px',
+  leftMaxWidth: '285px',
 
   // 右侧栏
-  rightWidth: '280px',
-  rightMinWidth: '220px',
-  rightMaxWidth: '350px',
+  rightWidth: '270px',
+  rightMinWidth: '240px',
+  rightMaxWidth: '300px',
 
   // 折叠宽度（与 header 高度一致，更统一）
   collapsedWidth: '56px',
@@ -501,6 +580,9 @@ export const designSystem = {
   zIndex,
   blur,
   opacity,
+  easings,             // 动画曲线系统
+  a11y,                // 无障碍支持
+  fluidTypography,     // 响应式文字缩放
   scrollbarSystem,     // 滚动条系统
   sidebarSystem,       // 侧边栏系统
   inputWidths,         // 输入组件宽度
@@ -509,7 +591,7 @@ export const designSystem = {
   buttonSizes,         // 按钮尺寸
   avatarSizes,         // 头像尺寸
   gridGutter,          // Grid gutter
-  transitions,
+  transitions,         // 过渡动画
 } as const;
 
 export default designSystem;

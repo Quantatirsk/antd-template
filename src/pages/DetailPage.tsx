@@ -9,10 +9,11 @@
  */
 
 import { useState } from 'react';
-import { Card, Descriptions, Tag, Button, Space, Tabs, Table, Timeline, Modal, Form, Input, Select, message } from 'antd';
-import { ArrowLeftOutlined, EditOutlined, DeleteOutlined, DownloadOutlined } from '@ant-design/icons';
+import { Card, Descriptions, Tag, Button, Space, Tabs, Table, Timeline, Modal, Form, Input, Select, message, Divider } from 'antd';
+import { ArrowLeftOutlined, EditOutlined, DeleteOutlined, DownloadOutlined, FileTextOutlined, LinkOutlined, HistoryOutlined, MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
 import { LoadingState } from '@/components/Common';
 import { designSystem } from '@/styles';
+import PageLayout from '@/components/layout/PageLayout';
 import type { ColumnsType } from 'antd/es/table';
 
 // ==================== 类型定义 ====================
@@ -83,6 +84,8 @@ export default function DetailPage() {
   const [data, setData] = useState<DetailData>(mockDetail);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('basic');
+  const [leftCollapsed, setLeftCollapsed] = useState(false);
+  const [rightCollapsed, setRightCollapsed] = useState(false);
 
   // ==================== 操作函数 ====================
 
@@ -128,12 +131,13 @@ export default function DetailPage() {
   // ==================== 关联数据表格 ====================
 
   const relatedColumns: ColumnsType<RelatedItem> = [
-    { title: '名称', dataIndex: 'name', key: 'name' },
-    { title: '关系', dataIndex: 'relationship', key: 'relationship' },
-    { title: '创建时间', dataIndex: 'createdAt', key: 'createdAt' },
+    { title: '名称', dataIndex: 'name', key: 'name', width: designSystem.tableColumnWidths.name },
+    { title: '关系', dataIndex: 'relationship', key: 'relationship', width: designSystem.tableColumnWidths.type },
+    { title: '创建时间', dataIndex: 'createdAt', key: 'createdAt', width: designSystem.tableColumnWidths.date },
     {
       title: '操作',
       key: 'action',
+      width: designSystem.tableColumnWidths.actionCompact,
       render: () => <Button type="link" size="small">查看</Button>,
     },
   ];
@@ -144,146 +148,273 @@ export default function DetailPage() {
     return <LoadingState mode="skeleton" rows={10} />;
   }
 
-  return (
+  // ==================== 顶部工具栏 ====================
+  const topBar = (
     <div style={{
-      padding: designSystem.spacing[6],
-      maxWidth: '1200px',
-      margin: '0 auto',
-      minHeight: '100%',
-      background: designSystem.semantic.surface.base,
+      display: 'flex',
+      alignItems: 'center',
+      gap: designSystem.spacing[1],  // 8px 最紧凑（与 ListPage 一致）
+      padding: designSystem.spacing[1],  // 8px 最紧凑（与 ListPage 一致）
+      width: '100%',
     }}>
-      {/* 顶部操作栏 */}
-      <div style={{ marginBottom: designSystem.spacing[6] }}>
-        <Space>
-          <Button icon={<ArrowLeftOutlined />} onClick={handleBack}>返回</Button>
-          <Button icon={<EditOutlined />} onClick={handleEdit}>编辑</Button>
-          <Button icon={<DownloadOutlined />} onClick={handleExport}>导出</Button>
-          <Button danger icon={<DeleteOutlined />} onClick={handleDelete}>删除</Button>
-        </Space>
-      </div>
+      <Button icon={<ArrowLeftOutlined />} onClick={handleBack}>返回</Button>
 
+      <div style={{ flex: 1 }} />
+
+      <Space size={parseInt(designSystem.spacing[1])}>
+        <Button icon={<EditOutlined />} onClick={handleEdit}>编辑</Button>
+        <Button icon={<DownloadOutlined />} onClick={handleExport}>导出</Button>
+        <Button danger icon={<DeleteOutlined />} onClick={handleDelete}>删除</Button>
+      </Space>
+    </div>
+  );
+
+  // ==================== 左侧边栏（快速导航）====================
+  const leftSidebar = (
+    <>
+      <div style={{
+        fontSize: designSystem.typography.fontSize.sm,
+        fontWeight: designSystem.typography.fontWeight.semibold,
+        color: designSystem.semantic.text.secondary,
+        marginBottom: designSystem.spacing[1],
+      }}>
+        快速导航
+      </div>
+      <Space direction="vertical" style={{ width: '100%' }} size={parseInt(designSystem.spacing[0.5])}>
+        <Button
+          type={activeTab === 'basic' ? 'primary' : 'text'}
+          icon={<FileTextOutlined />}
+          onClick={() => setActiveTab('basic')}
+          block
+          style={{ justifyContent: 'flex-start' }}
+        >
+          基本信息
+        </Button>
+        <Button
+          type={activeTab === 'related' ? 'primary' : 'text'}
+          icon={<LinkOutlined />}
+          onClick={() => setActiveTab('related')}
+          block
+          style={{ justifyContent: 'flex-start' }}
+        >
+          关联数据 ({mockRelatedItems.length})
+        </Button>
+        <Button
+          type={activeTab === 'history' ? 'primary' : 'text'}
+          icon={<HistoryOutlined />}
+          onClick={() => setActiveTab('history')}
+          block
+          style={{ justifyContent: 'flex-start' }}
+        >
+          操作历史 ({mockHistory.length})
+        </Button>
+      </Space>
+    </>
+  );
+
+  // ==================== 右侧边栏（关键信息）====================
+  const rightSidebar = (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: designSystem.spacing[1] }}>
+      {/* 状态卡片 */}
+      <Card size="small" title="状态">
+        <Tag color={data.status === 'active' ? 'green' : 'gray'} style={{ marginBottom: designSystem.spacing[1] }}>
+          {data.status === 'active' ? '活跃' : data.status === 'archived' ? '归档' : '草稿'}
+        </Tag>
+        <div style={{ fontSize: designSystem.typography.fontSize.sm, color: designSystem.semantic.text.tertiary }}>
+          {data.type === 'typeA' ? '类型 A' : data.type === 'typeB' ? '类型 B' : '类型 C'}
+        </div>
+      </Card>
+
+      {/* 快速统计 */}
+      <Card size="small" title="快速统计">
+        <div style={{ marginBottom: designSystem.spacing[2] }}>
+          <div style={{ fontSize: designSystem.typography.fontSize.xs, color: designSystem.semantic.text.tertiary, marginBottom: designSystem.spacing[0.25] }}>
+            节点数
+          </div>
+          <div style={{ fontSize: designSystem.typography.fontSize.lg, fontWeight: designSystem.typography.fontWeight.semibold, color: designSystem.colors.primary[500] }}>
+            {data.nodeCount.toLocaleString()}
+          </div>
+        </div>
+        <div style={{ marginBottom: designSystem.spacing[2] }}>
+          <div style={{ fontSize: designSystem.typography.fontSize.xs, color: designSystem.semantic.text.tertiary, marginBottom: designSystem.spacing[0.25] }}>
+            边数
+          </div>
+          <div style={{ fontSize: designSystem.typography.fontSize.lg, fontWeight: designSystem.typography.fontWeight.semibold, color: designSystem.colors.success }}>
+            {data.edgeCount.toLocaleString()}
+          </div>
+        </div>
+        <div>
+          <div style={{ fontSize: designSystem.typography.fontSize.xs, color: designSystem.semantic.text.tertiary, marginBottom: designSystem.spacing[0.25] }}>
+            平均度数
+          </div>
+          <div style={{ fontSize: designSystem.typography.fontSize.lg, fontWeight: designSystem.typography.fontWeight.semibold, color: designSystem.colors.info }}>
+            {(data.edgeCount / data.nodeCount).toFixed(2)}
+          </div>
+        </div>
+      </Card>
+
+      {/* 元信息 */}
+      <Card size="small" title="元信息">
+        <div style={{ fontSize: designSystem.typography.fontSize.sm, color: designSystem.semantic.text.secondary, marginBottom: designSystem.spacing[1] }}>
+          <div style={{ marginBottom: designSystem.spacing[0.5] }}>
+            <span style={{ color: designSystem.semantic.text.tertiary }}>创建人：</span>
+            {data.createdBy}
+          </div>
+          <div style={{ marginBottom: designSystem.spacing[0.5] }}>
+            <span style={{ color: designSystem.semantic.text.tertiary }}>创建时间：</span>
+            {data.createdAt}
+          </div>
+          <div>
+            <span style={{ color: designSystem.semantic.text.tertiary }}>最后更新：</span>
+            {data.updatedAt}
+          </div>
+        </div>
+        <Divider style={{ margin: `${designSystem.spacing[1]} 0` }} />
+        <div style={{ fontSize: designSystem.typography.fontSize.xs, color: designSystem.semantic.text.tertiary }}>
+          ID: {data.id}
+        </div>
+      </Card>
+
+      {/* 标签 */}
+      {data.tags.length > 0 && (
+        <Card size="small" title="标签">
+          <Space wrap size={parseInt(designSystem.spacing[0.5])}>
+            {data.tags.map(tag => <Tag key={tag}>{tag}</Tag>)}
+          </Space>
+        </Card>
+      )}
+    </div>
+  );
+
+  // ==================== 主内容区 ====================
+  const mainContent = (
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0 }}>
       {/* 标题区 */}
-      <div style={{ marginBottom: designSystem.spacing[6] }}>
-        <h1 style={{ fontSize: designSystem.typography.fontSize['3xl'], fontWeight: designSystem.typography.fontWeight.bold, marginBottom: designSystem.spacing[2] }}>
+      <div style={{ marginBottom: designSystem.spacing[3] }}>
+        <h1 style={{
+          fontSize: designSystem.typography.fontSize.xl,
+          fontWeight: designSystem.typography.fontWeight.semibold,
+          marginBottom: designSystem.spacing[1],
+          color: designSystem.semantic.text.primary,
+        }}>
           {data.name}
         </h1>
-        <Space>
-          <Tag color={data.status === 'active' ? 'green' : 'gray'}>
-            {data.status === 'active' ? '活跃' : data.status === 'archived' ? '归档' : '草稿'}
-          </Tag>
-          {data.tags.map(tag => <Tag key={tag}>{tag}</Tag>)}
-        </Space>
+        <p style={{
+          fontSize: designSystem.typography.fontSize.sm,
+          color: designSystem.semantic.text.secondary,
+          margin: 0,
+        }}>
+          {data.description}
+        </p>
       </div>
 
       {/* Tabs 区域 */}
-      <Tabs
-        activeKey={activeTab}
-        onChange={setActiveTab}
-        items={[
-          {
-            key: 'basic',
-            label: '基本信息',
-            children: (
-              <>
-                {/* 描述 */}
-                <Card size="small" title="描述" style={{ marginBottom: designSystem.spacing[4] }}>
-                  <p style={{ color: designSystem.semantic.text.secondary }}>{data.description}</p>
-                </Card>
+      <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
+        <Tabs
+          activeKey={activeTab}
+          onChange={setActiveTab}
+          style={{ flex: 1, display: 'flex', flexDirection: 'column' }}
+          items={[
+            {
+              key: 'basic',
+              label: '基本信息',
+              children: (
+                <div style={{ overflow: 'auto', height: '100%' }}>
+                  {/* 详细信息 */}
+                  <Card size="small" title="详细信息" style={{ marginBottom: designSystem.spacing[2] }}>
+                    <Descriptions column={2} bordered size="small">
+                      <Descriptions.Item label="ID">{data.id}</Descriptions.Item>
+                      <Descriptions.Item label="类型">
+                        {data.type === 'typeA' ? '类型 A' : data.type === 'typeB' ? '类型 B' : '类型 C'}
+                      </Descriptions.Item>
+                      <Descriptions.Item label="节点数">{data.nodeCount.toLocaleString()}</Descriptions.Item>
+                      <Descriptions.Item label="边数">{data.edgeCount.toLocaleString()}</Descriptions.Item>
+                      <Descriptions.Item label="创建人">{data.createdBy}</Descriptions.Item>
+                      <Descriptions.Item label="创建时间">{data.createdAt}</Descriptions.Item>
+                      <Descriptions.Item label="最后更新时间">{data.updatedAt}</Descriptions.Item>
+                      <Descriptions.Item label="状态">
+                        <Tag color={data.status === 'active' ? 'green' : 'gray'}>
+                          {data.status === 'active' ? '活跃' : data.status === 'archived' ? '归档' : '草稿'}
+                        </Tag>
+                      </Descriptions.Item>
+                    </Descriptions>
+                  </Card>
 
-                {/* 详细信息 */}
-                <Card size="small" title="详细信息" style={{ marginBottom: designSystem.spacing[4] }}>
-                  <Descriptions column={2} bordered size="small">
-                    <Descriptions.Item label="ID">{data.id}</Descriptions.Item>
-                    <Descriptions.Item label="类型">
-                      {data.type === 'typeA' ? '类型 A' : data.type === 'typeB' ? '类型 B' : '类型 C'}
-                    </Descriptions.Item>
-                    <Descriptions.Item label="节点数">{data.nodeCount.toLocaleString()}</Descriptions.Item>
-                    <Descriptions.Item label="边数">{data.edgeCount.toLocaleString()}</Descriptions.Item>
-                    <Descriptions.Item label="创建人">{data.createdBy}</Descriptions.Item>
-                    <Descriptions.Item label="创建时间">{data.createdAt}</Descriptions.Item>
-                    <Descriptions.Item label="最后更新时间">{data.updatedAt}</Descriptions.Item>
-                    <Descriptions.Item label="状态">
-                      <Tag color={data.status === 'active' ? 'green' : 'gray'}>
-                        {data.status === 'active' ? '活跃' : data.status === 'archived' ? '归档' : '草稿'}
-                      </Tag>
-                    </Descriptions.Item>
-                  </Descriptions>
-                </Card>
-
-                {/* 统计信息 */}
-                <Card size="small" title="统计信息">
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: designSystem.spacing[4] }}>
-                    <div>
-                      <div style={{ fontSize: designSystem.typography.fontSize['2xl'], fontWeight: designSystem.typography.fontWeight.bold, color: designSystem.colors.primary[500] }}>
-                        {data.nodeCount.toLocaleString()}
-                      </div>
-                      <div style={{ fontSize: designSystem.typography.fontSize.sm, color: designSystem.semantic.text.secondary }}>
-                        节点总数
-                      </div>
-                    </div>
-                    <div>
-                      <div style={{ fontSize: designSystem.typography.fontSize['2xl'], fontWeight: designSystem.typography.fontWeight.bold, color: designSystem.colors.success }}>
-                        {data.edgeCount.toLocaleString()}
-                      </div>
-                      <div style={{ fontSize: designSystem.typography.fontSize.sm, color: designSystem.semantic.text.secondary }}>
-                        边总数
-                      </div>
-                    </div>
-                    <div>
-                      <div style={{ fontSize: designSystem.typography.fontSize['2xl'], fontWeight: designSystem.typography.fontWeight.bold, color: designSystem.colors.info }}>
-                        {(data.edgeCount / data.nodeCount).toFixed(2)}
-                      </div>
-                      <div style={{ fontSize: designSystem.typography.fontSize.sm, color: designSystem.semantic.text.secondary }}>
-                        平均度数
-                      </div>
-                    </div>
-                  </div>
-                </Card>
-              </>
-            ),
-          },
-          {
-            key: 'related',
-            label: `关联数据 (${mockRelatedItems.length})`,
-            children: (
-              <Card size="small">
-                <Table
-                  size="small"
-                  columns={relatedColumns}
-                  dataSource={mockRelatedItems}
-                  rowKey="id"
-                  pagination={false}
-                />
-              </Card>
-            ),
-          },
-          {
-            key: 'history',
-            label: `操作历史 (${mockHistory.length})`,
-            children: (
-              <Card size="small">
-                <Timeline
-                  items={mockHistory.map(item => ({
-                    children: (
+                  {/* 统计信息 */}
+                  <Card size="small" title="统计信息">
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: designSystem.spacing[4] }}>
                       <div>
-                        <div style={{ fontWeight: designSystem.typography.fontWeight.semibold, marginBottom: designSystem.spacing[1] }}>
-                          {item.action}
+                        <div style={{ fontSize: designSystem.typography.fontSize['2xl'], fontWeight: designSystem.typography.fontWeight.bold, color: designSystem.colors.primary[500] }}>
+                          {data.nodeCount.toLocaleString()}
                         </div>
-                        <div style={{ fontSize: designSystem.typography.fontSize.sm, color: designSystem.semantic.text.secondary, marginBottom: designSystem.spacing[1] }}>
-                          {item.details}
-                        </div>
-                        <div style={{ fontSize: designSystem.typography.fontSize.xs, color: designSystem.semantic.text.tertiary }}>
-                          {item.user} · {item.timestamp}
+                        <div style={{ fontSize: designSystem.typography.fontSize.sm, color: designSystem.semantic.text.secondary }}>
+                          节点总数
                         </div>
                       </div>
-                    ),
-                  }))}
-                />
-              </Card>
-            ),
-          },
-        ]}
-      />
+                      <div>
+                        <div style={{ fontSize: designSystem.typography.fontSize['2xl'], fontWeight: designSystem.typography.fontWeight.bold, color: designSystem.colors.success }}>
+                          {data.edgeCount.toLocaleString()}
+                        </div>
+                        <div style={{ fontSize: designSystem.typography.fontSize.sm, color: designSystem.semantic.text.secondary }}>
+                          边总数
+                        </div>
+                      </div>
+                      <div>
+                        <div style={{ fontSize: designSystem.typography.fontSize['2xl'], fontWeight: designSystem.typography.fontWeight.bold, color: designSystem.colors.info }}>
+                          {(data.edgeCount / data.nodeCount).toFixed(2)}
+                        </div>
+                        <div style={{ fontSize: designSystem.typography.fontSize.sm, color: designSystem.semantic.text.secondary }}>
+                          平均度数
+                        </div>
+                      </div>
+                    </div>
+                  </Card>
+                </div>
+              ),
+            },
+            {
+              key: 'related',
+              label: `关联数据 (${mockRelatedItems.length})`,
+              children: (
+                <Card size="small" style={{ height: '100%', overflow: 'auto' }}>
+                  <Table
+                    size="small"
+                    columns={relatedColumns}
+                    dataSource={mockRelatedItems}
+                    rowKey="id"
+                    pagination={false}
+                  />
+                </Card>
+              ),
+            },
+            {
+              key: 'history',
+              label: `操作历史 (${mockHistory.length})`,
+              children: (
+                <Card size="small" style={{ height: '100%', overflow: 'auto' }}>
+                  <Timeline
+                    items={mockHistory.map(item => ({
+                      children: (
+                        <div>
+                          <div style={{ fontWeight: designSystem.typography.fontWeight.semibold, marginBottom: designSystem.spacing[0.5] }}>
+                            {item.action}
+                          </div>
+                          <div style={{ fontSize: designSystem.typography.fontSize.sm, color: designSystem.semantic.text.secondary, marginBottom: designSystem.spacing[0.5] }}>
+                            {item.details}
+                          </div>
+                          <div style={{ fontSize: designSystem.typography.fontSize.xs, color: designSystem.semantic.text.tertiary }}>
+                            {item.user} · {item.timestamp}
+                          </div>
+                        </div>
+                      ),
+                    }))}
+                  />
+                </Card>
+              ),
+            },
+          ]}
+        />
+      </div>
 
       {/* 编辑 Modal */}
       <Modal
@@ -319,5 +450,71 @@ export default function DetailPage() {
         </Form>
       </Modal>
     </div>
+  );
+
+  // ==================== 底部状态栏 ====================
+  const bottomBar = (
+    <div style={{ display: 'flex', alignItems: 'center', width: '100%', justifyContent: 'space-between' }}>
+      {/* 左侧信息 */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: designSystem.spacing[3] }}>
+        <span>数据集 ID: {data.id}</span>
+        <span>当前 Tab: {activeTab === 'basic' ? '基本信息' : activeTab === 'related' ? '关联数据' : '操作历史'}</span>
+        <span>状态: {data.status === 'active' ? '活跃' : data.status === 'archived' ? '归档' : '草稿'}</span>
+      </div>
+
+      {/* 右侧侧栏控制按钮 */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: designSystem.spacing[2] }}>
+        <Button
+          type="text"
+          size="small"
+          icon={leftCollapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+          onClick={() => setLeftCollapsed(!leftCollapsed)}
+          style={{
+            fontSize: designSystem.componentFontSize.button,
+            color: leftCollapsed ? designSystem.semantic.text.tertiary : designSystem.colors.primary[500],
+            display: 'flex',
+            alignItems: 'center',
+            gap: designSystem.spacing[0.5],
+          }}
+        >
+          <span style={{ fontSize: designSystem.componentFontSize.button }}>
+            左侧栏
+          </span>
+        </Button>
+        <Button
+          type="text"
+          size="small"
+          icon={rightCollapsed ? <MenuFoldOutlined /> : <MenuUnfoldOutlined />}
+          onClick={() => setRightCollapsed(!rightCollapsed)}
+          style={{
+            fontSize: designSystem.componentFontSize.button,
+            color: rightCollapsed ? designSystem.semantic.text.tertiary : designSystem.colors.primary[500],
+            display: 'flex',
+            alignItems: 'center',
+            gap: designSystem.spacing[0.5],
+          }}
+        >
+          <span style={{ fontSize: designSystem.componentFontSize.button }}>
+            右侧栏
+          </span>
+        </Button>
+      </div>
+    </div>
+  );
+
+  return (
+    <PageLayout
+      topBar={topBar}
+      leftSidebar={leftSidebar}
+      leftDefaultCollapsed={leftCollapsed}
+      onLeftCollapsedChange={setLeftCollapsed}
+      rightSidebar={rightSidebar}
+      rightDefaultCollapsed={rightCollapsed}
+      onRightCollapsedChange={setRightCollapsed}
+      bottomBar={bottomBar}
+      contentPadding={designSystem.spacing[1]}  // DetailPage 主内容区需要 padding
+    >
+      {mainContent}
+    </PageLayout>
   );
 }
