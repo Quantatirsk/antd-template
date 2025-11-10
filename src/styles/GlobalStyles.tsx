@@ -59,7 +59,7 @@ export function GlobalStyles() {
     }
 
     .ant-card-body {
-      padding: ${designSystem.spacing[2]} !important;  /* 12px (卡片紧凑padding) */
+      padding: ${designSystem.spacing[2]};  /* 12px (卡片紧凑padding) */
     }
 
     /* 卡片操作栏样式 - 极致紧凑设计 */
@@ -70,17 +70,17 @@ export function GlobalStyles() {
     }
 
     .ant-card-actions > li {
-      margin: ${designSystem.spacing[0.75]} 0 !important;  /* 上下各6px，总高度约28px */
-      padding: 0 !important;
+      margin: ${designSystem.spacing[0.75]} 0;  /* 上下各6px，总高度约28px */
+      padding: 0;
     }
 
     .ant-card-actions > li > span {
-      font-size: ${designSystem.componentFontSize.button} !important;  /* 13px */
-      line-height: 1.2 !important;  /* 紧凑行高 */
-      padding: 0 !important;
-      display: inline-flex !important;
-      align-items: center !important;
-      cursor: pointer !important;
+      font-size: ${designSystem.componentFontSize.button} !important;  /* 13px - 保留覆盖默认字体 */
+      line-height: 1.2;  /* 紧凑行高 */
+      padding: 0;
+      display: inline-flex;
+      align-items: center;
+      cursor: pointer;
     }
 
     .ant-card-actions > li > span > .anticon {

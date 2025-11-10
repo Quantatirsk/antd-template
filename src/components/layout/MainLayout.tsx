@@ -68,8 +68,9 @@ export default function MainLayout() {
           height: designSystem.heights.header,
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'space-between',
-          padding: `0 ${collapsed ? designSystem.spacing[4] : designSystem.spacing[6]}`,
+          justifyContent: collapsed ? 'center' : 'space-between',
+          paddingLeft: collapsed ? 0 : designSystem.spacing[6],
+          paddingRight: collapsed ? 0 : designSystem.spacing[2],
         }}
       >
         <span
@@ -103,8 +104,6 @@ export default function MainLayout() {
             style={{
               width: designSystem.buttonSizes.iconButton.width,
               height: designSystem.buttonSizes.iconButton.height,
-              marginLeft: collapsed ? 'auto' : 0,
-              marginRight: collapsed ? 'auto' : 0,
             }}
           />
         </Tooltip>

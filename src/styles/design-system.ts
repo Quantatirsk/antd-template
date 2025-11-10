@@ -222,8 +222,8 @@ export const cardSystem = {
 
   // Hover交互效果
   hover: {
-    translateY: '-1px',           // 卡片上浮距离
-    scale: 1.02,                  // 轻微放大比例
+    translateY: '0',              // 禁用卡片上浮效果
+    scale: 1,                     // 禁用放大效果
   },
 } as const;
 
@@ -261,7 +261,7 @@ export const tableSystem = {
   containerPadding: spacing[4],             // 20px（与卡片一致）
 
   // Hover效果
-  hoverTranslateY: '-1px',                  // 上浮距离
+  hoverTranslateY: '0',                     // 禁用上浮效果
   hoverTransition: '200ms cubic-bezier(0.4, 0, 0.2, 1)', // 过渡时间
 
   // Table内部样式
@@ -371,8 +371,8 @@ export const sidebarSystem = {
   rightMinWidth: '220px',
   rightMaxWidth: '350px',
 
-  // 折叠宽度
-  collapsedWidth: '64px',
+  // 折叠宽度（与 header 高度一致，更统一）
+  collapsedWidth: '56px',
 
   // 响应式断点（引用 breakpoints）
   autoCollapseBreakpoint: breakpoints.threeColumn,

@@ -483,7 +483,7 @@ export default function ListPage() {
                 margin: designSystem.spacing[1],  // 8px - 与左侧边栏对齐，防止阴影裁剪
                 minHeight: 0,
               }}
-              styles={{ body: { padding: parseInt(designSystem.spacing[2]), flex: 1, overflow: 'hidden' } }}
+              styles={{ body: { padding: parseInt(designSystem.spacing[1]), flex: 1, overflow: 'hidden' } }}
             >
               <Table
                 size="small"
