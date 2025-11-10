@@ -9,9 +9,9 @@
  * - 新建/编辑/删除
  */
 
-import { useState, useMemo, ReactNode } from 'react';
+import { useState, useMemo } from 'react';
 import { Input, Select, Button, Table, Card, Tag, Space, Modal, Form, message, Radio, Checkbox } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined, ExportOutlined, AppstoreOutlined, UnorderedListOutlined } from '@ant-design/icons';
+import { PlusOutlined, EditOutlined, DeleteOutlined, ExportOutlined, AppstoreOutlined, UnorderedListOutlined, MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
 import ThreeColumnLayout from '@/components/layout/ThreeColumnLayout';
 import { LoadingState, EmptyState } from '@/components/Common';
 import { designSystem } from '@/styles';
@@ -63,6 +63,8 @@ export default function ListPage() {
   const [viewMode, setViewMode] = useState<'card' | 'table'>('table');
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
+  const [leftCollapsed, setLeftCollapsed] = useState(false);
+  const [rightCollapsed, setRightCollapsed] = useState(false);
 
   // 分页
   const [currentPage, setCurrentPage] = useState(1);
@@ -240,72 +242,14 @@ export default function ListPage() {
 
   // ==================== 布局区域 ====================
 
-  // 渲染折叠按钮到topBar中
-  const renderCollapseControls = ({ leftButton, rightButton }: { leftButton?: ReactNode; rightButton?: ReactNode }) => (
-    <div style={{
-      display: 'flex',
-      alignItems: 'center',
-      gap: designSystem.spacing[1],  // 8px 最紧凑
-      padding: designSystem.spacing[1],  // 8px 最紧凑
-      width: '100%'
-    }}>
-      {/* 左侧折叠按钮 */}
-      {leftButton}
-
-      <Input.Search
-        placeholder="搜索名称或描述..."
-        value={searchText}
-        onChange={e => setSearchText(e.target.value)}
-        style={{ width: 240 }}
-        allowClear
-      />
-      <Select
-        value={statusFilter}
-        onChange={setStatusFilter}
-        style={{ width: 120 }}
-        options={[
-          { label: '全部状态', value: 'all' },
-          { label: '活跃', value: 'active' },
-          { label: '归档', value: 'archived' },
-          { label: '草稿', value: 'draft' },
-        ]}
-      />
-
-      <div style={{ flex: 1 }} />
-
-      {/* 批量操作 */}
-      {selectedKeys.length > 0 && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: designSystem.spacing[1] }}>  {/* 8px */}
-          <span style={{ fontSize: designSystem.typography.fontSize.sm, color: designSystem.semantic.text.secondary }}>
-            已选中 {selectedKeys.length} 项
-          </span>
-          <Button size="small" danger onClick={handleBatchDelete}>批量删除</Button>
-          <Button size="small" onClick={() => setSelectedKeys([])}>取消选择</Button>
-        </div>
-      )}
-
-      <Radio.Group value={viewMode} onChange={e => setViewMode(e.target.value)} size="small">
-        <Radio.Button value="card"><AppstoreOutlined /></Radio.Button>
-        <Radio.Button value="table"><UnorderedListOutlined /></Radio.Button>
-      </Radio.Group>
-      <Button icon={<ExportOutlined />} onClick={handleExport}>导出</Button>
-      <Button type="primary" icon={<PlusOutlined />} onClick={() => setCreateModalOpen(true)}>
-        新建
-      </Button>
-
-      {/* 右侧折叠按钮 */}
-      {rightButton}
-    </div>
-  );
-
-  // 保留原topBar用于不使用renderCollapseControls的场景
+  // topBar 工具栏（移除折叠按钮）
   const topBar = (
     <div style={{
       display: 'flex',
       alignItems: 'center',
       gap: designSystem.spacing[1],  // 8px 最紧凑
       padding: designSystem.spacing[1],  // 8px 最紧凑
-      height: '100%'
+      width: '100%'
     }}>
       <Input.Search
         placeholder="搜索名称或描述..."
@@ -451,13 +395,54 @@ export default function ListPage() {
     </div>
   );
 
-  // 底部状态栏
+  // 底部状态栏（带侧栏控制按钮）
   const bottomBar = (
-    <>
-      <span>总数: {filteredData.length}</span>
-      <span style={{ marginLeft: designSystem.spacing[1] }}>选中: {selectedKeys.length}</span>  {/* 8px */}
-      <span style={{ marginLeft: designSystem.spacing[1] }}>页码: {currentPage}/{Math.ceil(filteredData.length / pageSize)}</span>
-    </>
+    <div style={{ display: 'flex', alignItems: 'center', width: '100%', justifyContent: 'space-between' }}>
+      {/* 左侧信息 */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: designSystem.spacing[3] }}>
+        <span>总数: {filteredData.length}</span>
+        <span>选中: {selectedKeys.length}</span>
+        <span>页码: {currentPage}/{Math.ceil(filteredData.length / pageSize)}</span>
+      </div>
+
+      {/* 右侧侧栏控制按钮 */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: designSystem.spacing[2] }}>
+        <Button
+          type="text"
+          size="small"
+          icon={leftCollapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+          onClick={() => setLeftCollapsed(!leftCollapsed)}
+          style={{
+            fontSize: designSystem.componentFontSize.button,
+            color: leftCollapsed ? designSystem.semantic.text.tertiary : designSystem.colors.primary[500],
+            display: 'flex',
+            alignItems: 'center',
+            gap: '4px',
+          }}
+        >
+          <span style={{ fontSize: designSystem.componentFontSize.button }}>
+            左侧栏
+          </span>
+        </Button>
+        <Button
+          type="text"
+          size="small"
+          icon={rightCollapsed ? <MenuFoldOutlined /> : <MenuUnfoldOutlined />}
+          onClick={() => setRightCollapsed(!rightCollapsed)}
+          style={{
+            fontSize: designSystem.componentFontSize.button,
+            color: rightCollapsed ? designSystem.semantic.text.tertiary : designSystem.colors.primary[500],
+            display: 'flex',
+            alignItems: 'center',
+            gap: '4px',
+          }}
+        >
+          <span style={{ fontSize: designSystem.componentFontSize.button }}>
+            右侧栏
+          </span>
+        </Button>
+      </div>
+    </div>
   );
 
   // ==================== 渲染 ====================
@@ -466,16 +451,18 @@ export default function ListPage() {
       <ThreeColumnLayout
         topBar={topBar}
         leftSidebar={leftSidebar}
+        leftDefaultCollapsed={leftCollapsed}
+        onLeftCollapsedChange={setLeftCollapsed}
         rightSidebar={rightSidebar}
+        rightDefaultCollapsed={rightCollapsed}
+        onRightCollapsedChange={setRightCollapsed}
         bottomBar={bottomBar}
-        renderCollapseControls={renderCollapseControls}
       >
         <div style={{
           flex: 1,
           display: 'flex',
           flexDirection: 'column',
           minHeight: 0,
-          padding: designSystem.spacing[1],  // 8px 最紧凑布局
           background: designSystem.semantic.surface.base,
         }}>
           {loading ? (
@@ -490,9 +477,11 @@ export default function ListPage() {
             <Card
               style={{
                 borderRadius: designSystem.tableSystem.containerBorderRadius,
-                height: '100%',
+                flex: 1,
                 display: 'flex',
                 flexDirection: 'column',
+                margin: designSystem.spacing[1],  // 8px - 与左侧边栏对齐，防止阴影裁剪
+                minHeight: 0,
               }}
               styles={{ body: { padding: 12, flex: 1, overflow: 'hidden' } }}
             >
@@ -516,11 +505,19 @@ export default function ListPage() {
                   onChange: setSelectedKeys as any,
                   columnWidth: 48,  // 固定勾选框列宽度
                 }}
-                scroll={{ x: 1000, y: 'calc(100vh - 290px)' }}  // 自适应高度: Header(56) + 各层padding(44) + topBar(56) + 表头(32) + 分页器(40) + 底部栏(28) + 间隙(34) = 290px
+                scroll={{ x: 1000, y: 'calc(100vh - 306px)' }}  // 自适应高度: Header(56) + topBar(56) + 表头(32) + 分页器(40) + 底部栏(28) + 间隙(34) + Card margin(16) + padding(44) = 306px
               />
             </Card>
           ) : (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: designSystem.spacing[1] }}>  {/* 8px */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+              gap: designSystem.spacing[1],  // 8px
+              flex: 1,
+              overflow: 'auto',
+              minHeight: 0,
+              padding: designSystem.spacing[1],  // 8px - 防止卡片阴影被裁剪
+            }}>
               {paginatedData.map(item => (
                 <Card
                   key={item.id}

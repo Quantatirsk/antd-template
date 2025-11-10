@@ -10,8 +10,6 @@
  */
 
 import { useState, useEffect, ReactNode } from 'react';
-import { Button, Tooltip } from 'antd';
-import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
 import { designSystem } from '@/styles/design-system';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 
@@ -23,7 +21,6 @@ interface ThreeColumnLayoutProps {
   // 左侧边栏
   leftSidebar?: ReactNode;
   leftSidebarWidth?: string;
-  leftCollapsible?: boolean;
   leftDefaultCollapsed?: boolean;
   onLeftCollapsedChange?: (collapsed: boolean) => void;
 
@@ -33,19 +30,11 @@ interface ThreeColumnLayoutProps {
   // 右侧边栏
   rightSidebar?: ReactNode;
   rightSidebarWidth?: string;
-  rightCollapsible?: boolean;
   rightDefaultCollapsed?: boolean;
   onRightCollapsedChange?: (collapsed: boolean) => void;
 
   // 底部状态栏
   bottomBar?: ReactNode;
-  bottomBarHeight?: string;
-
-  // 折叠控制渲染函数（可选，用于自定义位置）
-  renderCollapseControls?: (controls: {
-    leftButton?: ReactNode;
-    rightButton?: ReactNode;
-  }) => ReactNode;
 }
 
 export default function ThreeColumnLayout({
@@ -53,22 +42,17 @@ export default function ThreeColumnLayout({
   topBarHeight = '40px',
   leftSidebar,
   leftSidebarWidth = '240px',
-  leftCollapsible = true,
   leftDefaultCollapsed = false,
   onLeftCollapsedChange,
   children,
   rightSidebar,
   rightSidebarWidth = '280px',
-  rightCollapsible = true,
   rightDefaultCollapsed = false,
   onRightCollapsedChange,
   bottomBar,
-  renderCollapseControls,
 }: ThreeColumnLayoutProps) {
   const [leftCollapsed, setLeftCollapsed] = useState(leftDefaultCollapsed);
   const [rightCollapsed, setRightCollapsed] = useState(rightDefaultCollapsed);
-  const [leftTooltipOpen, setLeftTooltipOpen] = useState(false);
-  const [rightTooltipOpen, setRightTooltipOpen] = useState(false);
 
   // 处理折叠状态变化
   const handleLeftCollapse = (collapsed: boolean) => {
@@ -98,44 +82,14 @@ export default function ThreeColumnLayout({
     }
   }, [isWideEnough, leftDefaultCollapsed, rightDefaultCollapsed]);
 
-  // 折叠按钮组件
-  const leftButton = leftSidebar && leftCollapsible ? (
-    <Tooltip
-      title={leftCollapsed ? '展开左侧边栏' : '折叠左侧边栏'}
-      placement="right"
-      open={leftTooltipOpen}
-      onOpenChange={setLeftTooltipOpen}
-    >
-      <Button
-        type="text"
-        size="small"
-        icon={leftCollapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-        onClick={() => {
-          handleLeftCollapse(!leftCollapsed);
-          setLeftTooltipOpen(false);
-        }}
-      />
-    </Tooltip>
-  ) : undefined;
+  // 监听外部状态变化（支持受控模式）
+  useEffect(() => {
+    setLeftCollapsed(leftDefaultCollapsed);
+  }, [leftDefaultCollapsed]);
 
-  const rightButton = rightSidebar && rightCollapsible ? (
-    <Tooltip
-      title={rightCollapsed ? '展开右侧边栏' : '折叠右侧边栏'}
-      placement="left"
-      open={rightTooltipOpen}
-      onOpenChange={setRightTooltipOpen}
-    >
-      <Button
-        type="text"
-        size="small"
-        icon={rightCollapsed ? <MenuFoldOutlined /> : <MenuUnfoldOutlined />}
-        onClick={() => {
-          handleRightCollapse(!rightCollapsed);
-          setRightTooltipOpen(false);
-        }}
-      />
-    </Tooltip>
-  ) : undefined;
+  useEffect(() => {
+    setRightCollapsed(rightDefaultCollapsed);
+  }, [rightDefaultCollapsed]);
 
   return (
     <div
@@ -159,7 +113,7 @@ export default function ThreeColumnLayout({
             zIndex: 10,
           }}
         >
-          {renderCollapseControls ? renderCollapseControls({ leftButton, rightButton }) : topBar}
+          {topBar}
         </div>
       )}
 
@@ -187,27 +141,6 @@ export default function ThreeColumnLayout({
 
         {/* 主内容区 */}
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, minWidth: 0 }}>
-          {/* 折叠按钮容器 - 仅在未自定义渲染时显示 */}
-          {!renderCollapseControls && ((leftSidebar && leftCollapsible) || (rightSidebar && rightCollapsible)) && (
-            <div
-              style={{
-                minHeight: '40px',
-                flexShrink: 0,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                padding: `0 ${designSystem.spacing[2]}`,
-                backgroundColor: designSystem.semantic.surface.base,
-              }}
-            >
-              {/* 左侧折叠按钮 */}
-              {leftButton || <div />}
-
-              {/* 右侧折叠按钮 */}
-              {rightButton || <div />}
-            </div>
-          )}
-
           {children}
         </div>
 

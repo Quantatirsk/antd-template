@@ -8,6 +8,42 @@ import { designSystem } from './design-system';
 
 export function GlobalStyles() {
   const styles = `
+    /* 全局滚动条样式 - 统一设计 */
+    /* 配置来源: designSystem.spacing, designSystem.colors */
+    * {
+      scrollbar-width: thin;  /* Firefox */
+      scrollbar-color: ${designSystem.semantic.text.tertiary} transparent;  /* Firefox: thumb track */
+    }
+
+    /* WebKit 浏览器 (Chrome, Safari, Edge) */
+    *::-webkit-scrollbar {
+      width: 4px;  /* 垂直滚动条宽度 - 极简设计 */
+      height: 4px;  /* 水平滚动条高度 */
+    }
+
+    *::-webkit-scrollbar-track {
+      background: transparent;  /* 轨道背景透明 */
+    }
+
+    *::-webkit-scrollbar-thumb {
+      background-color: ${designSystem.semantic.text.tertiary};  /* 滑块颜色 - 浅灰 */
+      border-radius: 2px;  /* 圆角 */
+      transition: background-color ${designSystem.transitions.fast};  /* 平滑过渡 */
+    }
+
+    *::-webkit-scrollbar-thumb:hover {
+      background-color: ${designSystem.colors.primary[500]};  /* hover 时变为品牌色 */
+    }
+
+    /* 确保滚动条尺寸不变 */
+    *::-webkit-scrollbar-button {
+      display: none;  /* 隐藏滚动条箭头按钮 */
+    }
+
+    *::-webkit-scrollbar-corner {
+      background: transparent;  /* 滚动条交角透明 */
+    }
+
     /* 全局卡片样式 - Apple级现代设计 */
     /* 配置来源: designSystem.cardSystem */
     .ant-card {
