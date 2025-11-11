@@ -230,6 +230,7 @@ export default function PageLayout({
             fontSize: designSystem.typography.fontSize.sm,
             gap: designSystem.spacing[1],  // 8px
             backgroundColor: designSystem.semantic.surface.base,
+            margin: `0 -${designSystem.spacing[1]} -${designSystem.spacing[1]} -${designSystem.spacing[1]}`,  // 抵消父容器 padding，贴合底部和两边
           }}
         >
           {bottomBar}

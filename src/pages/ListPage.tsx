@@ -36,7 +36,7 @@ interface DataItem {
 const mockData: DataItem[] = Array.from({ length: 500 }, (_, i) => ({
   id: String(i + 1),
   name: `数据集 ${i + 1}`,
-  description: `这是数据集 ${i + 1} 的描述信息`,
+  description: `这是数据集 ${i + 1} 的描述信息，这是数据集这是数据集这是数据集这是数据集这是数据集`,
   status: ['active', 'archived', 'draft'][i % 3] as any,
   type: ['typeA', 'typeB', 'typeC'][i % 3] as any,
   createdAt: new Date(Date.now() - i * 86400000).toISOString(),
@@ -215,6 +215,7 @@ export default function ListPage() {
       dataIndex: 'createdAt',
       key: 'createdAt',
       width: designSystem.tableColumnWidths.date,
+      ellipsis: true,
       render: (date: string) => {
         const d = new Date(date);
         return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;

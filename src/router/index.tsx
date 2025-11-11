@@ -13,6 +13,7 @@ import { LoadingState } from '@/components/Common';
 const DashboardPage = lazy(() => import('@/pages/DashboardPage'));
 const ListPage = lazy(() => import('@/pages/ListPage'));
 const DetailPage = lazy(() => import('@/pages/DetailPage'));
+const LayoutGuidePage = lazy(() => import('@/pages/LayoutGuidePage'));
 
 // ==================== 布局组件 ====================
 
@@ -61,6 +62,14 @@ export const router = createBrowserRouter([
         element: (
           <Suspense fallback={<PageLoading />}>
             <DetailPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: 'layout-guide',
+        element: (
+          <Suspense fallback={<PageLoading />}>
+            <LayoutGuidePage />
           </Suspense>
         ),
       },

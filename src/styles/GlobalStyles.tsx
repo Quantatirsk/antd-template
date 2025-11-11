@@ -173,6 +173,9 @@ export function GlobalStyles() {
       padding-inline: 12px !important;
       font-size: ${designSystem.componentFontSize.tableHeader} !important;
       font-weight: ${designSystem.typography.fontWeight.semibold} !important;
+      white-space: nowrap !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
     }
 
     .ant-table-tbody > tr > td {
@@ -180,6 +183,10 @@ export function GlobalStyles() {
       padding-inline: 12px !important;
       border-color: ${designSystem.tableSystem.borderColor} !important;
       font-size: ${designSystem.componentFontSize.tableCell} !important;
+      white-space: nowrap !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+      max-width: 0 !important;
     }
 
     .ant-table-tbody > tr:hover > td {

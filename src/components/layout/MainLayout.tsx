@@ -17,6 +17,7 @@ import {
   MenuOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
+  LayoutOutlined,
 } from '@ant-design/icons';
 import { designSystem } from '@/styles/design-system';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
@@ -64,9 +65,21 @@ export default function MainLayout() {
       icon: <FileTextOutlined />,
       label: '详情页',
     },
+    {
+      key: '/layout-guide',
+      icon: <LayoutOutlined />,
+      label: '布局说明',
+    },
   ];
 
   const selectedKey = location.pathname === '/' ? '/dashboard' : location.pathname;
+
+  // 根据路由获取页面标题
+  const getPageTitle = () => {
+    const path = location.pathname === '/' ? '/dashboard' : location.pathname;
+    const menuItem = menuItems.find(item => item.key === path);
+    return menuItem?.label || 'Ant Design Template';
+  };
 
   const menuContent = (
     <>
@@ -198,11 +211,12 @@ export default function MainLayout() {
             />
             <span
               style={{
-                fontSize: designSystem.typography.fontSize.base,
-                fontWeight: designSystem.typography.fontWeight.medium,
+                fontSize: designSystem.typography.fontSize.lg,
+                fontWeight: designSystem.typography.fontWeight.semibold,
+                color: designSystem.semantic.text.primary,
               }}
             >
-              Ant Design Template
+              {getPageTitle()}
             </span>
           </div>
         </Header>

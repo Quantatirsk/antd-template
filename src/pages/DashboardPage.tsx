@@ -314,16 +314,6 @@ export default function DashboardPage() {
       minHeight: 0,
       background: designSystem.semantic.surface.base,
     }}>
-      {/* 标题 */}
-      <h1 style={{
-        fontSize: designSystem.typography.fontSize.xl,
-        fontWeight: designSystem.typography.fontWeight.semibold,
-        marginBottom: designSystem.spacing[2],
-        padding: `0 ${designSystem.spacing[1]}`,
-      }}>
-        仪表板
-      </h1>
-
       <div style={{ flex: 1, overflow: 'auto', padding: designSystem.spacing[1] }}>
         {/* 统计卡片 */}
         <Row gutter={[parseInt(designSystem.spacing[1]), parseInt(designSystem.spacing[1])]} style={{ marginBottom: designSystem.spacing[2] }}>

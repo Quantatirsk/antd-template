@@ -289,24 +289,6 @@ export default function DetailPage() {
   // ==================== 主内容区 ====================
   const mainContent = (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0 }}>
-      {/* 标题区 */}
-      <div style={{ marginBottom: designSystem.spacing[3] }}>
-        <h1 style={{
-          fontSize: designSystem.typography.fontSize.xl,
-          fontWeight: designSystem.typography.fontWeight.semibold,
-          marginBottom: designSystem.spacing[1],
-          color: designSystem.semantic.text.primary,
-        }}>
-          {data.name}
-        </h1>
-        <p style={{
-          fontSize: designSystem.typography.fontSize.sm,
-          color: designSystem.semantic.text.secondary,
-          margin: 0,
-        }}>
-          {data.description}
-        </p>
-      </div>
 
       {/* Tabs 区域 */}
       <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
