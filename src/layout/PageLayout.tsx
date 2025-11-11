@@ -10,8 +10,32 @@
  */
 
 import { useState, useEffect, useRef, ReactNode } from 'react';
-import { designSystem } from '@/styles/design-system';
+import { designSystem } from '@/styles/DesignSystem';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
+
+const STORAGE_KEY = 'page-layout-sidebar-state';
+
+interface SidebarState {
+  left: boolean;
+  right: boolean;
+}
+
+const loadSidebarState = (): SidebarState | null => {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    return saved ? JSON.parse(saved) : null;
+  } catch {
+    return null;
+  }
+};
+
+const saveSidebarState = (state: SidebarState) => {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch {
+    // 忽略存储失败
+  }
+};
 
 interface PageLayoutProps {
   // 顶部工具栏
@@ -57,12 +81,22 @@ export default function PageLayout({
   onRightCollapsedChange,
   bottomBar,
 }: PageLayoutProps) {
-  const [leftCollapsed, setLeftCollapsed] = useState(leftDefaultCollapsed);
-  const [rightCollapsed, setRightCollapsed] = useState(rightDefaultCollapsed);
+  // 初始化：优先使用 localStorage，否则使用 props 默认值
+  const savedState = loadSidebarState();
+  const [leftCollapsed, setLeftCollapsed] = useState(
+    savedState?.left ?? leftDefaultCollapsed
+  );
+  const [rightCollapsed, setRightCollapsed] = useState(
+    savedState?.right ?? rightDefaultCollapsed
+  );
 
   // 记住用户在宽屏时的手动设置状态（用于窗口拉宽后恢复）
-  const leftUserPreference = useRef(leftDefaultCollapsed);
-  const rightUserPreference = useRef(rightDefaultCollapsed);
+  const leftUserPreference = useRef(savedState?.left ?? leftDefaultCollapsed);
+  const rightUserPreference = useRef(savedState?.right ?? rightDefaultCollapsed);
+
+  // 记录上一次的 prop 值，用于检测真正的变化
+  const prevLeftDefault = useRef(leftDefaultCollapsed);
+  const prevRightDefault = useRef(rightDefaultCollapsed);
 
   // 记录上一次的 isWideEnough 状态，用于检测窗口宽度变化
   const prevIsWideEnough = useRef<boolean | null>(null);
@@ -87,6 +121,21 @@ export default function PageLayout({
       rightUserPreference.current = collapsed;
     }
   };
+
+  // 初始化时同步实际状态到父组件
+  useEffect(() => {
+    if (leftCollapsed !== leftDefaultCollapsed) {
+      onLeftCollapsedChange?.(leftCollapsed);
+    }
+    if (rightCollapsed !== rightDefaultCollapsed) {
+      onRightCollapsedChange?.(rightCollapsed);
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // 持久化状态到 localStorage
+  useEffect(() => {
+    saveSidebarState({ left: leftCollapsed, right: rightCollapsed });
+  }, [leftCollapsed, rightCollapsed]);
 
   // 响应式断点：小于 900px 自动折叠侧边栏
   // 计算：左侧 240px + 右侧最小 220px + 主内容最小 400px = 860px，加上边距设为 900px
@@ -119,20 +168,24 @@ export default function PageLayout({
     prevIsWideEnough.current = isWideEnough;
   }, [isWideEnough]);
 
-  // 监听外部状态变化（支持受控模式）
+  // 监听外部状态变化（支持受控模式）- 仅在 prop 真正变化时响应
   useEffect(() => {
-    setLeftCollapsed(leftDefaultCollapsed);
-    // 如果窗口足够宽，同步更新用户偏好
-    if (isWideEnough) {
-      leftUserPreference.current = leftDefaultCollapsed;
+    if (prevLeftDefault.current !== leftDefaultCollapsed) {
+      setLeftCollapsed(leftDefaultCollapsed);
+      if (isWideEnough) {
+        leftUserPreference.current = leftDefaultCollapsed;
+      }
+      prevLeftDefault.current = leftDefaultCollapsed;
     }
   }, [leftDefaultCollapsed, isWideEnough]);
 
   useEffect(() => {
-    setRightCollapsed(rightDefaultCollapsed);
-    // 如果窗口足够宽，同步更新用户偏好
-    if (isWideEnough) {
-      rightUserPreference.current = rightDefaultCollapsed;
+    if (prevRightDefault.current !== rightDefaultCollapsed) {
+      setRightCollapsed(rightDefaultCollapsed);
+      if (isWideEnough) {
+        rightUserPreference.current = rightDefaultCollapsed;
+      }
+      prevRightDefault.current = rightDefaultCollapsed;
     }
   }, [rightDefaultCollapsed, isWideEnough]);
 
@@ -155,6 +208,7 @@ export default function PageLayout({
             backgroundColor: designSystem.semantic.surface.base,
             display: 'flex',
             alignItems: 'center',
+            overflow: 'auto',  // 防止内容溢出，支持横向滚动
             zIndex: 10,
           }}
         >

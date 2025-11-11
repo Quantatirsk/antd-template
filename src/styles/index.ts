@@ -1,4 +1,4 @@
-export * from './design-system';
-export * from './common-styles';
-export { default as designSystem } from './design-system';
+export * from './DesignSystem';
+export * from './CommonStyles';
+export { default as designSystem } from './DesignSystem';
 export { GlobalStyles } from './GlobalStyles';

@@ -6,7 +6,7 @@
 
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { lazy, Suspense } from 'react';
-import { LoadingState } from '@/components/Common';
+import { LoadingState } from '@/components/common';
 
 // ==================== 组件懒加载 ====================
 
@@ -14,10 +14,11 @@ const DashboardPage = lazy(() => import('@/pages/DashboardPage'));
 const ListPage = lazy(() => import('@/pages/ListPage'));
 const DetailPage = lazy(() => import('@/pages/DetailPage'));
 const LayoutGuidePage = lazy(() => import('@/pages/LayoutGuidePage'));
+const ModalDemoPage = lazy(() => import('@/pages/ModalDemoPage'));
 
 // ==================== 布局组件 ====================
 
-import MainLayout from '@/components/layout/MainLayout';
+import MainLayout from '@/layout/MainLayout';
 
 /**
  * Loading 组件 - 懒加载时的占位符
@@ -70,6 +71,14 @@ export const router = createBrowserRouter([
         element: (
           <Suspense fallback={<PageLoading />}>
             <LayoutGuidePage />
+          </Suspense>
+        ),
+      },
+      {
+        path: 'modal-demo',
+        element: (
+          <Suspense fallback={<PageLoading />}>
+            <ModalDemoPage />
           </Suspense>
         ),
       },

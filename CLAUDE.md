@@ -1,3 +1,4 @@
+
 # CLAUDE.md
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
@@ -6,16 +7,24 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Linus 开发原则：
 
-1. 数据结构优先于算法，保持简洁、高效、规范，不要过度设计。
+1. 数据结构优先于算法,保持简洁、高效、规范，不要过度设计。
 2. 不要过度设计和生产文档。过多解释等同于制造垃圾。
 3. 专注核心功能实现，完成代码修改后检查编辑器报错。
+
+## 代码规范
+
+### 前端 TypeScript
+
+严格类型约束：禁止使用 `any`，确保零类型错误。
 
 ## 工作流程
 
 ### 分析阶段
+
 代码分析、问题诊断、架构评估时：详细分析，充分解释问题和影响，对比可行方案优劣。
 
 ### 实现阶段
+
 代码编写、修改、重构时：减少冗余说明，直接展示核心变更，专注实现而非文档。
 
 ## 重要信息

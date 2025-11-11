@@ -8,7 +8,7 @@
 import { useState } from 'react';
 import { Card, Button, Tag, Typography } from 'antd';
 import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
-import PageLayout from '@/components/layout/PageLayout';
+import PageLayout from '@/layout/PageLayout';
 import { designSystem } from '@/styles';
 
 const { Title, Text, Paragraph } = Typography;
@@ -444,7 +444,7 @@ export default function LayoutGuidePage() {
         </div>
       </Card>
 
-      <Card size="small" title="布局层级">
+      <Card size="small" title="布局层级" style={{ marginBottom: designSystem.spacing[1] }}>
         <div style={{ fontSize: designSystem.typography.fontSize.sm }}>
           <pre style={{
             backgroundColor: designSystem.colors.neutral[50],
@@ -467,6 +467,140 @@ export default function LayoutGuidePage() {
          │  └─ rightSidebar
          └─ bottomBar`}
           </pre>
+        </div>
+      </Card>
+
+      <Card size="small" title="设计系统配置" style={{ marginBottom: designSystem.spacing[1] }}>
+        <div style={{ fontSize: designSystem.typography.fontSize.sm }}>
+          <div style={{ marginBottom: designSystem.spacing[1] }}>
+            <Text strong>Spacing System</Text>
+            <div style={{ color: designSystem.semantic.text.secondary, marginTop: designSystem.spacing[0.5] }}>
+              spacing[0.5] = 4px<br/>
+              spacing[1] = 8px<br/>
+              spacing[2] = 12px<br/>
+              spacing[3] = 16px<br/>
+              spacing[4] = 20px<br/>
+              spacing[5] = 24px
+            </div>
+          </div>
+          <div style={{ marginBottom: designSystem.spacing[1] }}>
+            <Text strong>Typography</Text>
+            <div style={{ color: designSystem.semantic.text.secondary, marginTop: designSystem.spacing[0.5] }}>
+              xs: 11px<br/>
+              sm: 12px<br/>
+              base: 13px<br/>
+              lg: 16px<br/>
+              xl: 18px
+            </div>
+          </div>
+          <div>
+            <Text strong>Heights</Text>
+            <div style={{ color: designSystem.semantic.text.secondary, marginTop: designSystem.spacing[0.5] }}>
+              header: 56px<br/>
+              toolbar: 48px<br/>
+              bottomBar: 40px
+            </div>
+          </div>
+        </div>
+      </Card>
+
+      <Card size="small" title="组件库" style={{ marginBottom: designSystem.spacing[1] }}>
+        <div style={{ fontSize: designSystem.typography.fontSize.sm }}>
+          <div style={{ marginBottom: designSystem.spacing[1] }}>
+            <Text strong>Layout 组件</Text>
+            <div style={{ color: designSystem.semantic.text.secondary, marginTop: designSystem.spacing[0.5] }}>
+              • MainLayout - 全局框架<br/>
+              • PageLayout - 页面组织<br/>
+              • StandardModalLayout<br/>
+              • DrawerLayout<br/>
+              • WizardModalLayout
+            </div>
+          </div>
+          <div>
+            <Text strong>特性</Text>
+            <div style={{ color: designSystem.semantic.text.secondary, marginTop: designSystem.spacing[0.5] }}>
+              • 响应式侧边栏<br/>
+              • 自动滚动处理<br/>
+              • 紧凑间距系统<br/>
+              • 统一配置管理
+            </div>
+          </div>
+        </div>
+      </Card>
+
+      <Card size="small" title="最佳实践" style={{ marginBottom: designSystem.spacing[1] }}>
+        <div style={{ fontSize: designSystem.typography.fontSize.sm }}>
+          <div style={{ marginBottom: designSystem.spacing[1] }}>
+            <Text strong>主页面</Text>
+            <div style={{ color: designSystem.semantic.text.secondary, marginTop: designSystem.spacing[0.5] }}>
+              • 使用 spacing[1] (8px)<br/>
+              • 充分利用空间<br/>
+              • 内容优先设计
+            </div>
+          </div>
+          <div style={{ marginBottom: designSystem.spacing[1] }}>
+            <Text strong>弹窗</Text>
+            <div style={{ color: designSystem.semantic.text.secondary, marginTop: designSystem.spacing[0.5] }}>
+              • 容器层 spacing[3] (16px)<br/>
+              • 框架层 spacing[1] (8px)<br/>
+              • 用户层 spacing[1] (8px)<br/>
+              • 总边距 24px
+            </div>
+          </div>
+          <div>
+            <Text strong>响应式</Text>
+            <div style={{ color: designSystem.semantic.text.secondary, marginTop: designSystem.spacing[0.5] }}>
+              • 移动端优先折叠<br/>
+              • 保存用户偏好<br/>
+              • 平滑过渡动画
+            </div>
+          </div>
+        </div>
+      </Card>
+
+      <Card size="small" title="性能优化" style={{ marginBottom: designSystem.spacing[1] }}>
+        <div style={{ fontSize: designSystem.typography.fontSize.sm }}>
+          <div style={{ marginBottom: designSystem.spacing[1] }}>
+            <Text strong>滚动优化</Text>
+            <div style={{ color: designSystem.semantic.text.secondary, marginTop: designSystem.spacing[0.5] }}>
+              • overflow: auto 内部滚动<br/>
+              • minHeight: 0 防止溢出<br/>
+              • flex: 1 自动填充<br/>
+              • 避免嵌套滚动
+            </div>
+          </div>
+          <div>
+            <Text strong>布局优化</Text>
+            <div style={{ color: designSystem.semantic.text.secondary, marginTop: designSystem.spacing[0.5] }}>
+              • CSS Grid/Flexbox<br/>
+              • 避免固定高度<br/>
+              • 使用 design tokens<br/>
+              • 统一间距系统
+            </div>
+          </div>
+        </div>
+      </Card>
+
+      <Card size="small" title="开发注意事项">
+        <div style={{ fontSize: designSystem.typography.fontSize.sm }}>
+          <div style={{ marginBottom: designSystem.spacing[1] }}>
+            <Text strong style={{ color: designSystem.colors.error[500] }}>禁止</Text>
+            <div style={{ color: designSystem.semantic.text.secondary, marginTop: designSystem.spacing[0.5] }}>
+              • 硬编码颜色值<br/>
+              • 直接使用像素值<br/>
+              • 修改全局样式<br/>
+              • 破坏响应式布局
+            </div>
+          </div>
+          <div>
+            <Text strong style={{ color: designSystem.colors.success[500] }}>推荐</Text>
+            <div style={{ color: designSystem.semantic.text.secondary, marginTop: designSystem.spacing[0.5] }}>
+              • 使用 designSystem tokens<br/>
+              • 遵循 spacing 系统<br/>
+              • 保持组件纯粹性<br/>
+              • 编写可复用组件
+            </div>
+          </div>
         </div>
       </Card>
     </>
@@ -545,7 +679,7 @@ export default function LayoutGuidePage() {
           fontSize: designSystem.typography.fontSize.sm,
           overflow: 'auto',
         }}>
-{`import PageLayout from '@/components/layout/PageLayout';
+{`import PageLayout from '@/layout/PageLayout';
 
 export default function MyPage() {
   const topBar = <div>工具栏内容</div>;

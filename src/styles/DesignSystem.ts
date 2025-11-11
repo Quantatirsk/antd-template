@@ -165,7 +165,7 @@ export const borderRadius = {
   lg: '6px',    // 卡片
   xl: '8px',    // Modal、Sheet
   '2xl': '12px', // 大卡片、面板
-  '3xl': '16px', // Hero区域
+  '3xl': '18px', // Hero区域
   full: '9999px', // 圆形
 } as const;
 
@@ -441,14 +441,14 @@ export const scrollbarSystem = {
 
 export const sidebarSystem = {
   // 左侧栏
-  leftWidth: '255px',
-  leftMinWidth: '225px',
-  leftMaxWidth: '285px',
+  leftWidth: '240px',
+  leftMinWidth: '220px',
+  leftMaxWidth: '260px',
 
   // 右侧栏
-  rightWidth: '270px',
+  rightWidth: '258px',
   rightMinWidth: '240px',
-  rightMaxWidth: '300px',
+  rightMaxWidth: '280px',
 
   // 折叠宽度（与 header 高度一致，更统一）
   collapsedWidth: '56px',

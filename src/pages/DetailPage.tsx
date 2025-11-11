@@ -11,9 +11,9 @@
 import { useState } from 'react';
 import { Card, Descriptions, Tag, Button, Space, Tabs, Table, Timeline, Modal, Form, Input, Select, message, Divider } from 'antd';
 import { ArrowLeftOutlined, EditOutlined, DeleteOutlined, DownloadOutlined, FileTextOutlined, LinkOutlined, HistoryOutlined, MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
-import { LoadingState } from '@/components/Common';
+import { LoadingState } from '@/components/common';
 import { designSystem } from '@/styles';
-import PageLayout from '@/components/layout/PageLayout';
+import PageLayout from '@/layout/PageLayout';
 import type { ColumnsType } from 'antd/es/table';
 
 // ==================== 类型定义 ====================

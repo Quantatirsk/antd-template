@@ -18,8 +18,9 @@ import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
   LayoutOutlined,
+  AppstoreOutlined,
 } from '@ant-design/icons';
-import { designSystem } from '@/styles/design-system';
+import { designSystem } from '@/styles/DesignSystem';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 
 const { Header, Sider, Content } = Layout;
@@ -41,8 +42,8 @@ export default function MainLayout() {
     // 注意：窗口变宽时不自动展开，用户需要手动展开
   }, [isWideEnough]);
 
-  // 点击内容区自动折叠侧边栏
-  const handleContentClick = () => {
+  // 点击菜单栏以外区域自动折叠侧边栏
+  const handleOutsideClick = () => {
     if (!collapsed) {
       setCollapsed(true);
     }
@@ -69,6 +70,11 @@ export default function MainLayout() {
       key: '/layout-guide',
       icon: <LayoutOutlined />,
       label: '布局说明',
+    },
+    {
+      key: '/modal-demo',
+      icon: <AppstoreOutlined />,
+      label: '弹窗演示',
     },
   ];
 
@@ -189,6 +195,7 @@ export default function MainLayout() {
         transition: 'margin-left 0.2s'
       }}>
         <Header
+          onClick={handleOutsideClick}
           style={{
             backgroundColor: designSystem.semantic.surface.base,
             boxShadow: designSystem.cardSystem.shadow,
@@ -222,7 +229,7 @@ export default function MainLayout() {
         </Header>
 
         <Content
-          onClick={handleContentClick}
+          onClick={handleOutsideClick}
           style={{
             height: `calc(100vh - ${designSystem.heights.header})`,
             overflow: 'auto',

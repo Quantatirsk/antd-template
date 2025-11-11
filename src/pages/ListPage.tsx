@@ -12,8 +12,8 @@
 import { useState, useMemo } from 'react';
 import { Input, Select, Button, Table, Card, Tag, Space, Modal, Form, message, Radio, Checkbox } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined, ExportOutlined, AppstoreOutlined, UnorderedListOutlined, MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
-import PageLayout from '@/components/layout/PageLayout';
-import { LoadingState, EmptyState } from '@/components/Common';
+import PageLayout from '@/layout/PageLayout';
+import { LoadingState, EmptyState } from '@/components/common';
 import { designSystem } from '@/styles';
 import type { ColumnsType } from 'antd/es/table';
 
@@ -248,6 +248,7 @@ export default function ListPage() {
     <div style={{
       display: 'flex',
       alignItems: 'center',
+      flexWrap: 'wrap',  // 窄屏时自动换行
       gap: designSystem.spacing[1],  // 8px 最紧凑
       padding: designSystem.spacing[1],  // 8px 最紧凑
       width: '100%'
@@ -256,13 +257,13 @@ export default function ListPage() {
         placeholder="搜索名称或描述..."
         value={searchText}
         onChange={e => setSearchText(e.target.value)}
-        style={{ width: designSystem.inputWidths.search }}
+        style={{ width: designSystem.inputWidths.search, minWidth: 0, flexShrink: 1 }}  // 允许收缩
         allowClear
       />
       <Select
         value={statusFilter}
         onChange={setStatusFilter}
-        style={{ width: designSystem.inputWidths.select }}
+        style={{ width: designSystem.inputWidths.select, minWidth: 0, flexShrink: 1 }}  // 允许收缩
         options={[
           { label: '全部状态', value: 'all' },
           { label: '活跃', value: 'active' },
@@ -271,7 +272,7 @@ export default function ListPage() {
         ]}
       />
 
-      <div style={{ flex: 1 }} />
+      <div style={{ flex: 1, minWidth: 0 }} />  {/* 弹簧：填充剩余空间，允许收缩到0 */}
 
       {/* 批量操作 */}
       {selectedKeys.length > 0 && (
@@ -284,12 +285,28 @@ export default function ListPage() {
         </div>
       )}
 
-      <Radio.Group value={viewMode} onChange={e => setViewMode(e.target.value)} size="small">
+      <Radio.Group
+        value={viewMode}
+        onChange={e => setViewMode(e.target.value)}
+        size="small"
+        style={{ flexShrink: 0 }}  // 防止被压缩
+      >
         <Radio.Button value="card"><AppstoreOutlined /></Radio.Button>
         <Radio.Button value="table"><UnorderedListOutlined /></Radio.Button>
       </Radio.Group>
-      <Button icon={<ExportOutlined />} onClick={handleExport}>导出</Button>
-      <Button type="primary" icon={<PlusOutlined />} onClick={() => setCreateModalOpen(true)}>
+      <Button
+        icon={<ExportOutlined />}
+        onClick={handleExport}
+        style={{ flexShrink: 0 }}  // 防止被压缩
+      >
+        导出
+      </Button>
+      <Button
+        type="primary"
+        icon={<PlusOutlined />}
+        onClick={() => setCreateModalOpen(true)}
+        style={{ flexShrink: 0 }}  // 防止被压缩
+      >
         新建
       </Button>
     </div>

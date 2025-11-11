@@ -4,7 +4,7 @@
  * 用于无法通过 ConfigProvider 配置的样式（如 hover 动画效果）
  */
 
-import { designSystem } from './design-system';
+import { designSystem } from './DesignSystem';
 
 export function GlobalStyles() {
   const styles = `
@@ -44,12 +44,10 @@ export function GlobalStyles() {
       background: transparent;  /* 滚动条交角透明 */
     }
 
-    /* 全局卡片样式 - 轻量边框 + 阴影设计 */
+    /* 全局卡片样式 - hover 动效（无法通过 token 配置）*/
     /* 配置来源: designSystem.cardSystem */
     .ant-card {
       border: 1px solid ${designSystem.semantic.border.light} !important;
-      box-shadow: ${designSystem.cardSystem.shadow} !important;
-      border-radius: ${designSystem.cardSystem.borderRadius} !important;
       transition: box-shadow ${designSystem.transitions.default}, transform ${designSystem.transitions.default} !important;
     }
 
@@ -58,19 +56,13 @@ export function GlobalStyles() {
       transform: translateY(${designSystem.cardSystem.hover.translateY}) !important;
     }
 
-    .ant-card-body {
-      padding: ${designSystem.spacing[2]};  /* 12px (卡片紧凑padding) */
-    }
-
-    /* 卡片操作栏样式 - 极致紧凑设计 */
+    /* 卡片操作栏细节样式 - 部分无法通过 token 配置 */
     .ant-card-actions {
-      background-color: ${designSystem.semantic.surface.base} !important;
       border-top: 1px solid ${designSystem.semantic.border.light} !important;
       padding: 0 !important;
     }
 
     .ant-card-actions > li {
-      margin: ${designSystem.spacing[0.5]} 0 !important;  /* 上下各2px，极致紧凑 */
       padding: 0;
     }
 
@@ -114,15 +106,13 @@ export function GlobalStyles() {
       height: 100%;
     }
 
-    /* Table组件样式 - 完整配置 */
+    /* Table组件样式 - 布局配置（无法通过 token 配置）*/
     /* 配置来源: designSystem.tableSystem */
     .ant-table {
       flex: 1 !important;
       display: flex !important;
       flex-direction: column !important;
       overflow: hidden;
-      border-radius: ${designSystem.tableSystem.containerBorderRadius} !important;
-      background-color: ${designSystem.tableSystem.containerBackground} !important;
     }
 
     .ant-table-container {
@@ -142,55 +132,20 @@ export function GlobalStyles() {
       margin-top: ${designSystem.spacing[2]} !important;
     }
 
-    /* 分页器字体大小 */
-    .ant-pagination {
-      font-size: ${designSystem.componentFontSize.pagination} !important;
-    }
+    /* 分页器样式已通过 App.tsx theme.components.Pagination 配置 */
 
-    .ant-pagination-item,
-    .ant-pagination-prev,
-    .ant-pagination-next,
-    .ant-pagination-jump-prev,
-    .ant-pagination-jump-next {
-      font-size: ${designSystem.componentFontSize.pagination} !important;
-    }
-
-    .ant-pagination-options {
-      font-size: ${designSystem.componentFontSize.pagination} !important;
-    }
-
-    .ant-pagination-options .ant-select-selector {
-      font-size: ${designSystem.componentFontSize.pagination} !important;
-    }
-
-    .ant-pagination-total-text {
-      font-size: ${designSystem.componentFontSize.pagination} !important;
-    }
-
+    /* Table 单元格布局细节（无法完全通过 token 配置）*/
     .ant-table-thead > tr > th {
-      background-color: ${designSystem.tableSystem.headerBackground} !important;
-      padding-block: 8px !important;
-      padding-inline: 12px !important;
-      font-size: ${designSystem.componentFontSize.tableHeader} !important;
-      font-weight: ${designSystem.typography.fontWeight.semibold} !important;
       white-space: nowrap !important;
       overflow: hidden !important;
       text-overflow: ellipsis !important;
     }
 
     .ant-table-tbody > tr > td {
-      padding-block: 8px !important;
-      padding-inline: 12px !important;
-      border-color: ${designSystem.tableSystem.borderColor} !important;
-      font-size: ${designSystem.componentFontSize.tableCell} !important;
       white-space: nowrap !important;
       overflow: hidden !important;
       text-overflow: ellipsis !important;
       max-width: 0 !important;
-    }
-
-    .ant-table-tbody > tr:hover > td {
-      background-color: ${designSystem.tableSystem.rowHoverBackground} !important;
     }
 
     /* Layout组件样式 */
@@ -207,23 +162,16 @@ export function GlobalStyles() {
       background-color: ${designSystem.semantic.surface.base} !important;
     }
 
-    /* Tooltip统一样式 */
+    /* Tooltip 额外样式（部分无法通过 token 配置）*/
     /* 配置来源: designSystem.tooltipSystem */
     .ant-tooltip {
       max-width: ${designSystem.tooltipSystem.maxWidth} !important;
     }
 
     .ant-tooltip-inner {
-      font-size: ${designSystem.componentFontSize.tooltip} !important;
       padding: ${designSystem.tooltipSystem.paddingBlock} ${designSystem.tooltipSystem.paddingInline} !important;
-      border-radius: ${designSystem.tooltipSystem.borderRadius} !important;
-      background-color: ${designSystem.tooltipSystem.background} !important;
       box-shadow: ${designSystem.tooltipSystem.boxShadow} !important;
       min-height: auto !important;
-    }
-
-    .ant-tooltip-arrow::before {
-      background: ${designSystem.tooltipSystem.background} !important;
     }
 
     /* 全局组件字体统一 - 语义化配置 */
@@ -270,12 +218,11 @@ export function GlobalStyles() {
       font-size: ${designSystem.componentFontSize.list} !important;
     }
 
-    /* Menu 菜单 */
-    .ant-menu-item,
-    .ant-menu-submenu-title {
-      font-size: ${designSystem.componentFontSize.menu} !important;
-      padding-inline: ${designSystem.spacing[3]} !important;  /* 16px - 左右内边距 */
-    }
+    /* Menu 菜单样式已通过 App.tsx theme.components.Menu 配置 */
+
+    /* ==================== 弹窗间距系统 ==================== */
+    /* 注意: Modal/Drawer 的 padding 已通过 App.tsx theme.components 配置 */
+    /* 此处保留用户自主构建 div 的 spacing[1] 约定 */
 
     /* ==================== 无障碍支持（WCAG 2.1）==================== */
 
@@ -295,7 +242,7 @@ export function GlobalStyles() {
       box-shadow: none;
     }
 
-    /* ==================== 尊重用户动画偏好 ==================== */
+    /* ==================== 用户动画偏好 ==================== */
 
     /* 为禁用动画的用户提供极短时长 */
     @media (prefers-reduced-motion: reduce) {

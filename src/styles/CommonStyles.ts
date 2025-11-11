@@ -4,7 +4,7 @@
  */
 
 import { CSSProperties } from 'react';
-import { designSystem } from './design-system';
+import { designSystem } from './DesignSystem';
 
 /**
  * Flex 布局相关样式

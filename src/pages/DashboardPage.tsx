@@ -11,7 +11,7 @@
 import { useState } from 'react';
 import { Card, Row, Col, Statistic, Progress, List, Tag, Button, Space, Select, DatePicker } from 'antd';
 import { ArrowUpOutlined, ArrowDownOutlined, UserOutlined, DatabaseOutlined, FileTextOutlined, ClockCircleOutlined, PlusOutlined, EyeOutlined, ReloadOutlined, DownloadOutlined, MenuFoldOutlined, MenuUnfoldOutlined, DashboardOutlined, BarChartOutlined, LineChartOutlined } from '@ant-design/icons';
-import PageLayout from '@/components/layout/PageLayout';
+import PageLayout from '@/layout/PageLayout';
 import { designSystem } from '@/styles';
 
 // ==================== 类型定义 ====================
@@ -139,7 +139,7 @@ export default function DashboardPage() {
 
       <Button icon={<ReloadOutlined />}>刷新</Button>
       <Button icon={<DownloadOutlined />}>导出</Button>
-      <Button type="primary" icon={<PlusOutlined />}>创建数据集</Button>
+      <Button type="primary" icon={<PlusOutlined />}>创建</Button>
     </div>
   );
 
