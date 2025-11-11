@@ -11,8 +11,10 @@
 
 import { useState, useEffect, useRef } from 'react';
 import type { ReactNode } from 'react';
+import { Button } from 'antd';
+import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
 import { designSystem } from '@/styles/DesignSystem';
-import { useMediaQuery } from '@/hooks/useMediaQuery';
+import { useResponsive } from '@/hooks/useResponsive';
 
 const STORAGE_KEY = 'page-layout-sidebar-state';
 
@@ -82,24 +84,30 @@ export default function PageLayout({
   onRightCollapsedChange,
   bottomBar,
 }: PageLayoutProps) {
-  // 初始化：优先使用 localStorage，否则使用 props 默认值
+  // 响应式断点：移动端/平板自动折叠侧边栏
+  const { isDesktop, isMobile } = useResponsive();
+
+  // 初始化：localStorage 优先级最高（避免闪烁）
   const savedState = loadSidebarState();
-  const [leftCollapsed, setLeftCollapsed] = useState(
-    savedState?.left ?? leftDefaultCollapsed
-  );
-  const [rightCollapsed, setRightCollapsed] = useState(
-    savedState?.right ?? rightDefaultCollapsed
-  );
+  const [leftCollapsed, setLeftCollapsed] = useState(() => {
+    // 移动端强制折叠
+    if (typeof window !== 'undefined' && window.innerWidth < 768) return true;
+    // localStorage 优先
+    if (savedState?.left !== undefined) return savedState.left;
+    // 最后才用 props
+    return leftDefaultCollapsed;
+  });
+  const [rightCollapsed, setRightCollapsed] = useState(() => {
+    if (typeof window !== 'undefined' && window.innerWidth < 768) return true;
+    if (savedState?.right !== undefined) return savedState.right;
+    return rightDefaultCollapsed;
+  });
 
   // 记住用户在宽屏时的手动设置状态（用于窗口拉宽后恢复）
   const leftUserPreference = useRef(savedState?.left ?? leftDefaultCollapsed);
   const rightUserPreference = useRef(savedState?.right ?? rightDefaultCollapsed);
 
-  // 记录上一次的 prop 值，用于检测真正的变化
-  const prevLeftDefault = useRef(leftDefaultCollapsed);
-  const prevRightDefault = useRef(rightDefaultCollapsed);
-
-  // 记录上一次的 isWideEnough 状态，用于检测窗口宽度变化
+  // 记录上一次的窗口宽度状态，用于检测真正的尺寸变化
   const prevIsWideEnough = useRef<boolean | null>(null);
 
   // 处理折叠状态变化
@@ -108,7 +116,7 @@ export default function PageLayout({
     onLeftCollapsedChange?.(collapsed);
 
     // 如果是用户手动操作且窗口足够宽，保存偏好
-    if (isUserAction && isWideEnough) {
+    if (isUserAction && isDesktop) {
       leftUserPreference.current = collapsed;
     }
   };
@@ -118,85 +126,63 @@ export default function PageLayout({
     onRightCollapsedChange?.(collapsed);
 
     // 如果是用户手动操作且窗口足够宽，保存偏好
-    if (isUserAction && isWideEnough) {
+    if (isUserAction && isDesktop) {
       rightUserPreference.current = collapsed;
     }
   };
 
-  // 初始化时同步实际状态到父组件
+  // 初始化时同步实际状态到父组件（一次性）
   useEffect(() => {
-    if (leftCollapsed !== leftDefaultCollapsed) {
-      onLeftCollapsedChange?.(leftCollapsed);
-    }
-    if (rightCollapsed !== rightDefaultCollapsed) {
-      onRightCollapsedChange?.(rightCollapsed);
-    }
+    onLeftCollapsedChange?.(leftCollapsed);
+    onRightCollapsedChange?.(rightCollapsed);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // 持久化状态到 localStorage
+  // 持久化状态到 localStorage（仅桌面端）
   useEffect(() => {
-    saveSidebarState({ left: leftCollapsed, right: rightCollapsed });
-  }, [leftCollapsed, rightCollapsed]);
+    if (isDesktop) {
+      saveSidebarState({ left: leftCollapsed, right: rightCollapsed });
+    }
+  }, [leftCollapsed, rightCollapsed, isDesktop]);
 
-  // 响应式断点：小于 900px 自动折叠侧边栏
-  // 计算：左侧 240px + 右侧最小 220px + 主内容最小 400px = 860px，加上边距设为 900px
-  const isWideEnough = useMediaQuery(`(min-width: ${designSystem.breakpoints.threeColumn})`);
-
-  // 响应式折叠/展开侧边栏
+  // 响应式折叠/展开侧边栏（仅处理窗口尺寸变化，不处理路由切换）
   useEffect(() => {
     // 初始化
     if (prevIsWideEnough.current === null) {
-      prevIsWideEnough.current = isWideEnough;
+      prevIsWideEnough.current = isDesktop;
       return;
     }
 
     const wasWideEnough = prevIsWideEnough.current;
 
-    // 窗口从宽变窄：保存当前状态并自动折叠
-    if (wasWideEnough && !isWideEnough) {
-      leftUserPreference.current = leftCollapsed;
-      rightUserPreference.current = rightCollapsed;
-      handleLeftCollapse(true);
-      handleRightCollapse(true);
-    }
-
-    // 窗口从窄变宽：恢复用户偏好
-    if (!wasWideEnough && isWideEnough) {
-      handleLeftCollapse(leftUserPreference.current);
-      handleRightCollapse(rightUserPreference.current);
-    }
-
-    prevIsWideEnough.current = isWideEnough;
-  }, [isWideEnough]);
-
-  // 监听外部状态变化（支持受控模式）- 仅在 prop 真正变化时响应
-  useEffect(() => {
-    if (prevLeftDefault.current !== leftDefaultCollapsed) {
-      setLeftCollapsed(leftDefaultCollapsed);
-      if (isWideEnough) {
-        leftUserPreference.current = leftDefaultCollapsed;
+    // 仅在窗口尺寸真正变化时触发（避免路由切换时的闪烁）
+    if (wasWideEnough !== isDesktop) {
+      // 窗口从宽变窄：保存当前状态并自动折叠
+      if (wasWideEnough && !isDesktop) {
+        leftUserPreference.current = leftCollapsed;
+        rightUserPreference.current = rightCollapsed;
+        handleLeftCollapse(true);
+        handleRightCollapse(true);
       }
-      prevLeftDefault.current = leftDefaultCollapsed;
-    }
-  }, [leftDefaultCollapsed, isWideEnough]);
 
-  useEffect(() => {
-    if (prevRightDefault.current !== rightDefaultCollapsed) {
-      setRightCollapsed(rightDefaultCollapsed);
-      if (isWideEnough) {
-        rightUserPreference.current = rightDefaultCollapsed;
+      // 窗口从窄变宽：恢复用户偏好
+      if (!wasWideEnough && isDesktop) {
+        handleLeftCollapse(leftUserPreference.current);
+        handleRightCollapse(rightUserPreference.current);
       }
-      prevRightDefault.current = rightDefaultCollapsed;
+
+      prevIsWideEnough.current = isDesktop;
     }
-  }, [rightDefaultCollapsed, isWideEnough]);
+  }, [isDesktop, leftCollapsed, rightCollapsed]);
+
+  // 监听外部状态变化已移除：localStorage 优先级最高，避免闪烁
 
   return (
     <div
       style={{
         display: 'flex',
         flexDirection: 'column',
-        height: '100%',
-        minHeight: 0,
+        height: isMobile ? 'auto' : '100%',
+        minHeight: isMobile ? '100vh' : 0,
         backgroundColor: designSystem.semantic.surface.base,
       }}
     >
@@ -272,21 +258,56 @@ export default function PageLayout({
       </div>
 
       {/* 底部状态栏 */}
-      <div
-        style={{
-          flexShrink: 0,
-          boxShadow: designSystem.shadows.xs,
-          display: 'flex',
-          alignItems: 'center',
-          padding: designSystem.spacing[1],  // 8px 最紧凑布局
-          fontSize: designSystem.typography.fontSize.sm,
-          gap: designSystem.spacing[1],  // 8px
-          backgroundColor: designSystem.semantic.surface.base,
-          margin: `0 -${designSystem.spacing[1]} -${designSystem.spacing[1]} -${designSystem.spacing[1]}`,  // 抵消父容器 padding，贴合底部和两边
-        }}
-      >
-        {bottomBar}
-      </div>
+      {!isMobile && (
+        <div
+          style={{
+            flexShrink: 0,
+            boxShadow: designSystem.shadows.xs,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: designSystem.spacing[1],  // 8px 最紧凑布局
+            fontSize: designSystem.typography.fontSize.sm,
+            gap: designSystem.spacing[1],  // 8px
+            backgroundColor: designSystem.semantic.surface.base,
+            margin: `0 -${designSystem.spacing[1]} -${designSystem.spacing[1]} -${designSystem.spacing[1]}`,  // 抵消父容器 padding，贴合底部和两边
+          }}
+        >
+          {/* 左侧：页面传入的内容 */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: designSystem.spacing[3] }}>
+            {bottomBar}
+          </div>
+
+          {/* 右侧：统一的侧栏控制按钮 */}
+          {(leftSidebar || rightSidebar) && (
+            <Button
+              type="text"
+              size="small"
+              icon={
+                (leftCollapsed && rightCollapsed) ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />
+              }
+              onClick={() => {
+                const nextState = leftCollapsed && rightCollapsed ? false : true;
+                handleLeftCollapse(nextState, true);
+                handleRightCollapse(nextState, true);
+              }}
+              style={{
+                fontSize: designSystem.componentFontSize.button,
+                color: (leftCollapsed && rightCollapsed)
+                  ? designSystem.semantic.text.tertiary
+                  : designSystem.colors.primary[500],
+                display: 'flex',
+                alignItems: 'center',
+                gap: designSystem.spacing[0.5],
+              }}
+            >
+              <span style={{ fontSize: designSystem.componentFontSize.button }}>
+                侧栏
+              </span>
+            </Button>
+          )}
+        </div>
+      )}
     </div>
   );
 }

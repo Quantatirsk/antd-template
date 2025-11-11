@@ -21,26 +21,26 @@ import {
   AppstoreOutlined,
 } from '@ant-design/icons';
 import { designSystem } from '@/styles/DesignSystem';
-import { useMediaQuery } from '@/hooks/useMediaQuery';
+import { useResponsive } from '@/hooks/useResponsive';
 
 const { Header, Sider, Content } = Layout;
 
 export default function MainLayout() {
   const navigate = useNavigate();
   const location = useLocation();
-  const [collapsed, setCollapsed] = useState(false);
+
+  // 响应式：移动端/平板自动折叠
+  const { isDesktop, isMobile } = useResponsive();
+
+  const [collapsed, setCollapsed] = useState(() => !isDesktop);
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
   const [tooltipOpen, setTooltipOpen] = useState(false);
 
-  // 响应式：窗口宽度小于 1024px 时自动折叠
-  const isWideEnough = useMediaQuery(`(min-width: ${designSystem.breakpoints.laptop})`);
-
   useEffect(() => {
-    if (!isWideEnough) {
+    if (!isDesktop) {
       setCollapsed(true);
     }
-    // 注意：窗口变宽时不自动展开，用户需要手动展开
-  }, [isWideEnough]);
+  }, [isDesktop]);
 
   // 点击菜单栏以外区域自动折叠侧边栏
   const handleOutsideClick = () => {
@@ -150,26 +150,28 @@ export default function MainLayout() {
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
-      {/* 桌面侧边栏 */}
-      <Sider
-        theme="light"
-        width={parseInt(designSystem.sidebarSystem.leftWidth)}
-        collapsedWidth={parseInt(designSystem.sidebarSystem.collapsedWidth)}
-        collapsed={collapsed}
-        trigger={null}
-        style={{
-          boxShadow: designSystem.cardSystem.shadow,
-          overflow: 'auto',
-          height: '100vh',
-          position: 'fixed',
-          left: 0,
-          top: 0,
-          bottom: 0,
-          zIndex: 100,
-        }}
-      >
-        {menuContent}
-      </Sider>
+      {/* 桌面侧边栏（移动端隐藏）*/}
+      {!isMobile && (
+        <Sider
+          theme="light"
+          width={parseInt(designSystem.sidebarSystem.leftWidth)}
+          collapsedWidth={parseInt(designSystem.sidebarSystem.collapsedWidth)}
+          collapsed={collapsed}
+          trigger={null}
+          style={{
+            boxShadow: designSystem.cardSystem.shadow,
+            overflow: 'auto',
+            height: '100vh',
+            position: 'fixed',
+            left: 0,
+            top: 0,
+            bottom: 0,
+            zIndex: 100,
+          }}
+        >
+          {menuContent}
+        </Sider>
+      )}
 
       {/* 移动端抽屉 */}
       <Drawer
@@ -191,8 +193,9 @@ export default function MainLayout() {
       </Drawer>
 
       <Layout style={{
-        marginLeft: collapsed ? parseInt(designSystem.sidebarSystem.collapsedWidth) : parseInt(designSystem.sidebarSystem.leftWidth),
-        transition: 'margin-left 0.2s'
+        marginLeft: isMobile ? 0 : (collapsed ? parseInt(designSystem.sidebarSystem.collapsedWidth) : parseInt(designSystem.sidebarSystem.leftWidth)),
+        transition: 'margin-left 0.2s',
+        minHeight: isMobile ? '100vh' : '100%',
       }}>
         <Header
           onClick={handleOutsideClick}
@@ -214,7 +217,7 @@ export default function MainLayout() {
               type="text"
               icon={<MenuOutlined />}
               onClick={() => setMobileDrawerOpen(true)}
-              style={{ display: 'none' }}
+              style={{ display: isMobile ? 'inline-flex' : 'none' }}
             />
             <span
               style={{

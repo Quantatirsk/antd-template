@@ -10,7 +10,7 @@
 
 import { useState } from 'react';
 import { Card, Row, Col, Statistic, Progress, List, Tag, Button, Space, Select, DatePicker } from 'antd';
-import { ArrowUpOutlined, ArrowDownOutlined, UserOutlined, DatabaseOutlined, FileTextOutlined, ClockCircleOutlined, PlusOutlined, EyeOutlined, ReloadOutlined, DownloadOutlined, MenuFoldOutlined, MenuUnfoldOutlined, DashboardOutlined, BarChartOutlined, LineChartOutlined } from '@ant-design/icons';
+import { ArrowUpOutlined, ArrowDownOutlined, UserOutlined, DatabaseOutlined, FileTextOutlined, ClockCircleOutlined, PlusOutlined, EyeOutlined, ReloadOutlined, DownloadOutlined, DashboardOutlined, BarChartOutlined, LineChartOutlined } from '@ant-design/icons';
 import PageLayout from '@/layout/PageLayout';
 import { designSystem } from '@/styles';
 
@@ -257,52 +257,11 @@ export default function DashboardPage() {
 
   // ==================== 底部状态栏 ====================
   const bottomBar = (
-    <div style={{ display: 'flex', alignItems: 'center', width: '100%', justifyContent: 'space-between' }}>
-      {/* 左侧信息 */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: designSystem.spacing[3], fontSize: designSystem.typography.fontSize.sm }}>
-        <span>时间范围: {timePeriod === '1d' ? '今天' : timePeriod === '7d' ? '最近 7 天' : timePeriod === '30d' ? '最近 30 天' : '最近 90 天'}</span>
-        <span>活动数: {mockActivities.length}</span>
-        <span>最后更新: 刚刚</span>
-      </div>
-
-      {/* 右侧侧栏控制按钮 */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: designSystem.spacing[2] }}>
-        <Button
-          type="text"
-          size="small"
-          icon={leftCollapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-          onClick={() => setLeftCollapsed(!leftCollapsed)}
-          style={{
-            fontSize: designSystem.componentFontSize.button,
-            color: leftCollapsed ? designSystem.semantic.text.tertiary : designSystem.colors.primary[500],
-            display: 'flex',
-            alignItems: 'center',
-            gap: designSystem.spacing[0.5],
-          }}
-        >
-          <span style={{ fontSize: designSystem.componentFontSize.button }}>
-            左侧栏
-          </span>
-        </Button>
-        <Button
-          type="text"
-          size="small"
-          icon={rightCollapsed ? <MenuFoldOutlined /> : <MenuUnfoldOutlined />}
-          onClick={() => setRightCollapsed(!rightCollapsed)}
-          style={{
-            fontSize: designSystem.componentFontSize.button,
-            color: rightCollapsed ? designSystem.semantic.text.tertiary : designSystem.colors.primary[500],
-            display: 'flex',
-            alignItems: 'center',
-            gap: designSystem.spacing[0.5],
-          }}
-        >
-          <span style={{ fontSize: designSystem.componentFontSize.button }}>
-            右侧栏
-          </span>
-        </Button>
-      </div>
-    </div>
+    <>
+      <span>时间范围: {timePeriod === '1d' ? '今天' : timePeriod === '7d' ? '最近 7 天' : timePeriod === '30d' ? '最近 30 天' : '最近 90 天'}</span>
+      <span>活动数: {mockActivities.length}</span>
+      <span>最后更新: 刚刚</span>
+    </>
   );
 
   // ==================== 主内容区 ====================

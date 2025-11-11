@@ -10,7 +10,7 @@
 
 import { useState } from 'react';
 import { Card, Descriptions, Tag, Button, Space, Tabs, Table, Timeline, Modal, Form, Input, Select, message, Divider } from 'antd';
-import { ArrowLeftOutlined, EditOutlined, DeleteOutlined, DownloadOutlined, FileTextOutlined, LinkOutlined, HistoryOutlined, MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined, EditOutlined, DeleteOutlined, DownloadOutlined, FileTextOutlined, LinkOutlined, HistoryOutlined } from '@ant-design/icons';
 import { LoadingState } from '@/components/common';
 import { designSystem } from '@/styles';
 import PageLayout from '@/layout/PageLayout';
@@ -436,52 +436,11 @@ export default function DetailPage() {
 
   // ==================== 底部状态栏 ====================
   const bottomBar = (
-    <div style={{ display: 'flex', alignItems: 'center', width: '100%', justifyContent: 'space-between' }}>
-      {/* 左侧信息 */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: designSystem.spacing[3] }}>
-        <span>数据集 ID: {data.id}</span>
-        <span>当前 Tab: {activeTab === 'basic' ? '基本信息' : activeTab === 'related' ? '关联数据' : '操作历史'}</span>
-        <span>状态: {data.status === 'active' ? '活跃' : data.status === 'archived' ? '归档' : '草稿'}</span>
-      </div>
-
-      {/* 右侧侧栏控制按钮 */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: designSystem.spacing[2] }}>
-        <Button
-          type="text"
-          size="small"
-          icon={leftCollapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-          onClick={() => setLeftCollapsed(!leftCollapsed)}
-          style={{
-            fontSize: designSystem.componentFontSize.button,
-            color: leftCollapsed ? designSystem.semantic.text.tertiary : designSystem.colors.primary[500],
-            display: 'flex',
-            alignItems: 'center',
-            gap: designSystem.spacing[0.5],
-          }}
-        >
-          <span style={{ fontSize: designSystem.componentFontSize.button }}>
-            左侧栏
-          </span>
-        </Button>
-        <Button
-          type="text"
-          size="small"
-          icon={rightCollapsed ? <MenuFoldOutlined /> : <MenuUnfoldOutlined />}
-          onClick={() => setRightCollapsed(!rightCollapsed)}
-          style={{
-            fontSize: designSystem.componentFontSize.button,
-            color: rightCollapsed ? designSystem.semantic.text.tertiary : designSystem.colors.primary[500],
-            display: 'flex',
-            alignItems: 'center',
-            gap: designSystem.spacing[0.5],
-          }}
-        >
-          <span style={{ fontSize: designSystem.componentFontSize.button }}>
-            右侧栏
-          </span>
-        </Button>
-      </div>
-    </div>
+    <>
+      <span>数据集 ID: {data.id}</span>
+      <span>当前 Tab: {activeTab === 'basic' ? '基本信息' : activeTab === 'related' ? '关联数据' : '操作历史'}</span>
+      <span>状态: {data.status === 'active' ? '活跃' : data.status === 'archived' ? '归档' : '草稿'}</span>
+    </>
   );
 
   return (

@@ -11,7 +11,7 @@
 
 import { useState, useMemo } from 'react';
 import { Input, Select, Button, Table, Card, Tag, Space, Modal, Form, message, Radio, Checkbox } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined, ExportOutlined, AppstoreOutlined, UnorderedListOutlined, MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
+import { PlusOutlined, EditOutlined, DeleteOutlined, ExportOutlined, AppstoreOutlined, UnorderedListOutlined } from '@ant-design/icons';
 import PageLayout from '@/layout/PageLayout';
 import { LoadingState, EmptyState } from '@/components/common';
 import { designSystem } from '@/styles';
@@ -413,54 +413,13 @@ export default function ListPage() {
     </>
   );
 
-  // 底部状态栏（带侧栏控制按钮）
+  // 底部状态栏
   const bottomBar = (
-    <div style={{ display: 'flex', alignItems: 'center', width: '100%', justifyContent: 'space-between' }}>
-      {/* 左侧信息 */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: designSystem.spacing[3] }}>
-        <span>总数: {filteredData.length}</span>
-        <span>选中: {selectedKeys.length}</span>
-        <span>页码: {currentPage}/{Math.ceil(filteredData.length / pageSize)}</span>
-      </div>
-
-      {/* 右侧侧栏控制按钮 */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: designSystem.spacing[2] }}>
-        <Button
-          type="text"
-          size="small"
-          icon={leftCollapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-          onClick={() => setLeftCollapsed(!leftCollapsed)}
-          style={{
-            fontSize: designSystem.componentFontSize.button,
-            color: leftCollapsed ? designSystem.semantic.text.tertiary : designSystem.colors.primary[500],
-            display: 'flex',
-            alignItems: 'center',
-            gap: designSystem.spacing[0.5],
-          }}
-        >
-          <span style={{ fontSize: designSystem.componentFontSize.button }}>
-            左侧栏
-          </span>
-        </Button>
-        <Button
-          type="text"
-          size="small"
-          icon={rightCollapsed ? <MenuFoldOutlined /> : <MenuUnfoldOutlined />}
-          onClick={() => setRightCollapsed(!rightCollapsed)}
-          style={{
-            fontSize: designSystem.componentFontSize.button,
-            color: rightCollapsed ? designSystem.semantic.text.tertiary : designSystem.colors.primary[500],
-            display: 'flex',
-            alignItems: 'center',
-            gap: designSystem.spacing[0.5],
-          }}
-        >
-          <span style={{ fontSize: designSystem.componentFontSize.button }}>
-            右侧栏
-          </span>
-        </Button>
-      </div>
-    </div>
+    <>
+      <span>总数: {filteredData.length}</span>
+      <span>选中: {selectedKeys.length}</span>
+      <span>页码: {currentPage}/{Math.ceil(filteredData.length / pageSize)}</span>
+    </>
   );
 
   // ==================== 渲染 ====================

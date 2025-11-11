@@ -13,6 +13,8 @@ export default function ModalDemoPage() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [wizardOpen, setWizardOpen] = useState(false);
   const [form] = Form.useForm();
+  const [leftCollapsed, setLeftCollapsed] = useState(false);
+  const [rightCollapsed, setRightCollapsed] = useState(false);
 
   // StandardModalLayout 演示
   const renderStandardModal = () => (
@@ -203,8 +205,15 @@ export default function ModalDemoPage() {
 
   // 主内容
   const mainContent = (
-    <div style={{ padding: designSystem.spacing[5] }}>
-      <Card title="弹窗布局组件演示" style={{ marginBottom: designSystem.spacing[5] }}>
+    <div style={{
+      flex: 1,
+      display: 'flex',
+      flexDirection: 'column',
+      minHeight: 0,
+      background: designSystem.semantic.surface.base,
+    }}>
+      <div style={{ flex: 1, overflow: 'auto', padding: designSystem.spacing[1] }}>
+        <Card title="弹窗布局组件演示" style={{ marginBottom: designSystem.spacing[2] }}>
         <Space direction="vertical" size="large" style={{ width: '100%' }}>
           <div>
             <h3>StandardModalLayout - 标准三段式弹窗</h3>
@@ -305,16 +314,69 @@ export default function ModalDemoPage() {
         </pre>
       </Card>
 
-      {renderStandardModal()}
-      {renderDrawer()}
-      {renderWizardModal()}
+        {renderStandardModal()}
+        {renderDrawer()}
+        {renderWizardModal()}
+      </div>
     </div>
+  );
+
+  // 左侧边栏
+  const leftSidebar = (
+    <Card size="small" style={{ borderRadius: designSystem.borderRadius.lg }}>
+      <h3 style={{ fontSize: designSystem.typography.fontSize.sm, fontWeight: designSystem.typography.fontWeight.semibold, marginBottom: designSystem.spacing[2] }}>
+        组件说明
+      </h3>
+      <Space direction="vertical" size={parseInt(designSystem.spacing[2])} style={{ width: '100%' }}>
+        <div>
+          <div style={{ fontWeight: designSystem.typography.fontWeight.semibold, marginBottom: designSystem.spacing[0.5] }}>StandardModalLayout</div>
+          <div style={{ fontSize: designSystem.typography.fontSize.sm, color: designSystem.semantic.text.secondary }}>三段式布局：Header + Content + Footer</div>
+        </div>
+        <div>
+          <div style={{ fontWeight: designSystem.typography.fontWeight.semibold, marginBottom: designSystem.spacing[0.5] }}>DrawerLayout</div>
+          <div style={{ fontSize: designSystem.typography.fontSize.sm, color: designSystem.semantic.text.secondary }}>侧边栏布局：Header + Content + Footer</div>
+        </div>
+        <div>
+          <div style={{ fontWeight: designSystem.typography.fontWeight.semibold, marginBottom: designSystem.spacing[0.5] }}>WizardModalLayout</div>
+          <div style={{ fontSize: designSystem.typography.fontSize.sm, color: designSystem.semantic.text.secondary }}>向导式布局：Steps + Content + Navigation</div>
+        </div>
+      </Space>
+    </Card>
+  );
+
+  // 右侧边栏
+  const rightSidebar = (
+    <Card size="small" style={{ borderRadius: designSystem.borderRadius.lg }}>
+      <h3 style={{ fontSize: designSystem.typography.fontSize.sm, fontWeight: designSystem.typography.fontWeight.semibold, marginBottom: designSystem.spacing[2] }}>
+        使用建议
+      </h3>
+      <Space direction="vertical" size={parseInt(designSystem.spacing[2])} style={{ width: '100%', fontSize: designSystem.typography.fontSize.sm }}>
+        <div>
+          <div style={{ fontWeight: designSystem.typography.fontWeight.semibold, marginBottom: designSystem.spacing[0.5] }}>表单场景</div>
+          <div style={{ color: designSystem.semantic.text.secondary }}>使用 StandardModalLayout</div>
+        </div>
+        <div>
+          <div style={{ fontWeight: designSystem.typography.fontWeight.semibold, marginBottom: designSystem.spacing[0.5] }}>详情查看</div>
+          <div style={{ color: designSystem.semantic.text.secondary }}>使用 DrawerLayout</div>
+        </div>
+        <div>
+          <div style={{ fontWeight: designSystem.typography.fontWeight.semibold, marginBottom: designSystem.spacing[0.5] }}>多步骤流程</div>
+          <div style={{ color: designSystem.semantic.text.secondary }}>使用 WizardModalLayout</div>
+        </div>
+      </Space>
+    </Card>
   );
 
   return (
     <PageLayout
       topBar={<div style={{ padding: designSystem.spacing[1], fontSize: designSystem.typography.fontSize.sm, fontWeight: designSystem.typography.fontWeight.semibold }}>弹窗布局组件演示</div>}
-      bottomBar={<div style={{ fontSize: designSystem.typography.fontSize.sm, color: designSystem.semantic.text.secondary }}>Modal 布局组件演示页</div>}
+      leftSidebar={leftSidebar}
+      leftDefaultCollapsed={leftCollapsed}
+      onLeftCollapsedChange={setLeftCollapsed}
+      rightSidebar={rightSidebar}
+      rightDefaultCollapsed={rightCollapsed}
+      onRightCollapsedChange={setRightCollapsed}
+      bottomBar={<span>Modal 布局组件演示页</span>}
     >
       {mainContent}
     </PageLayout>

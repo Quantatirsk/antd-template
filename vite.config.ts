@@ -14,6 +14,7 @@ export default defineConfig({
     },
   },
   server: {
+    host: true,  // 允许外部访问（手机）
     open: true,
   },
 });

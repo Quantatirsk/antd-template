@@ -10,10 +10,27 @@
         height: 100%;
         margin: 0;
         padding: 0;
-        overflow: hidden;
       }
       #root {
         height: 100%;
+      }
+
+      /* 桌面端固定布局 */
+      @media (min-width: 768px) {
+        html, body {
+          overflow: hidden;
+        }
+      }
+
+      /* 移动端允许滚动 */
+      @media (max-width: 767px) {
+        html, body {
+          overflow: auto;
+        }
+        #root {
+          min-height: 100%;
+          height: auto;
+        }
       }
     </style>
   </head>

@@ -7,7 +7,6 @@
 
 import { useState } from 'react';
 import { Card, Button, Tag, Typography } from 'antd';
-import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
 import PageLayout from '@/layout/PageLayout';
 import { designSystem } from '@/styles';
 
@@ -608,38 +607,7 @@ export default function LayoutGuidePage() {
 
   /* ==================== 底部状态栏 ==================== */
   const bottomBar = (
-    <div style={{ display: 'flex', alignItems: 'center', width: '100%', justifyContent: 'space-between' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: designSystem.spacing[3], fontSize: designSystem.typography.fontSize.sm }}>
-        <Text type="secondary">提示：此页面展示布局结构和设计建议</Text>
-      </div>
-
-      <div style={{ display: 'flex', alignItems: 'center', gap: designSystem.spacing[2] }}>
-        <Button
-          type="text"
-          size="small"
-          icon={leftCollapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-          onClick={() => setLeftCollapsed(!leftCollapsed)}
-          style={{
-            fontSize: designSystem.componentFontSize.button,
-            color: leftCollapsed ? designSystem.semantic.text.tertiary : designSystem.colors.primary[500],
-          }}
-        >
-          左侧栏
-        </Button>
-        <Button
-          type="text"
-          size="small"
-          icon={rightCollapsed ? <MenuFoldOutlined /> : <MenuUnfoldOutlined />}
-          onClick={() => setRightCollapsed(!rightCollapsed)}
-          style={{
-            fontSize: designSystem.componentFontSize.button,
-            color: rightCollapsed ? designSystem.semantic.text.tertiary : designSystem.colors.primary[500],
-          }}
-        >
-          右侧栏
-        </Button>
-      </div>
-    </div>
+    <Text type="secondary">提示：此页面展示布局结构和设计建议</Text>
   );
 
   /* ==================== 主内容区 ==================== */
