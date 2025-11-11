@@ -5,7 +5,8 @@
  * 内置步骤管理逻辑
  */
 
-import { ReactNode, useState } from 'react';
+import { useState } from 'react';
+import type { ReactNode } from 'react';
 import { Steps, Button } from 'antd';
 import { designSystem } from '@/styles/DesignSystem';
 

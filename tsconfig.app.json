@@ -1,0 +1,45 @@
+{
+  "compilerOptions": {
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
+    "target": "ES2022",
+    "useDefineForClassFields": true,
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+    "jsx": "react-jsx",
+    
+    /* Path mappings */
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+
+    /* Linting */
+  "strict": true,
+  "noFallthroughCasesInSwitch": true,
+  "noUncheckedSideEffectImports": true,
+  "allowUnreachableCode": false,
+  "forceConsistentCasingInFileNames": true,
+  "erasableSyntaxOnly": true,
+
+  /* 可以放宽的规则 */
+  "noUncheckedIndexedAccess": false,        // 🟢 强烈建议关闭
+  "exactOptionalPropertyTypes": false,      // 🟢 强烈建议关闭
+  "noImplicitReturns": false,               // 🟢 建议关闭
+  
+  "noUnusedParameters": true,               // 🟡 保留但允许 _prefix
+  "noUnusedLocals": true,                   // 🟡 或改为 warning
+
+  /* 根据项目决定 */
+  "noPropertyAccessFromIndexSignature": false,  // 已是 false
+  "allowUnusedLabels": false                    // label 很少用
+  },
+  "include": ["src"]
+}

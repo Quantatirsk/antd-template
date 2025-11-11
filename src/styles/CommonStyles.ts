@@ -3,7 +3,7 @@
  * 提供常用的 CSS 样式对象，避免重复定义
  */
 
-import { CSSProperties } from 'react';
+import type { CSSProperties } from 'react';
 import { designSystem } from './DesignSystem';
 
 /**

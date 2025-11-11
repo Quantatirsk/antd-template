@@ -5,7 +5,7 @@
  * 支持顶部工具栏、底部操作栏
  */
 
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { designSystem } from '@/styles/DesignSystem';
 
 interface DrawerLayoutProps {

@@ -312,7 +312,10 @@ export default function ModalDemoPage() {
   );
 
   return (
-    <PageLayout>
+    <PageLayout
+      topBar={<div style={{ padding: designSystem.spacing[1], fontSize: designSystem.typography.fontSize.sm, fontWeight: designSystem.typography.fontWeight.semibold }}>弹窗布局组件演示</div>}
+      bottomBar={<div style={{ fontSize: designSystem.typography.fontSize.sm, color: designSystem.semantic.text.secondary }}>Modal 布局组件演示页</div>}
+    >
       {mainContent}
     </PageLayout>
   );

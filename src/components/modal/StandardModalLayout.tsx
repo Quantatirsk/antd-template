@@ -5,7 +5,7 @@
  * 特性：Content 可滚动，自动高度限制
  */
 
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { designSystem } from '@/styles/DesignSystem';
 
 interface StandardModalLayoutProps {

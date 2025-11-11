@@ -2,14 +2,15 @@
  * PageLayout - 通用页面布局组件
  *
  * 布局结构：
- * - 顶部工具栏（可选）
+ * - 顶部工具栏
  * - 左侧边栏（可折叠）
  * - 主内容区
  * - 右侧边栏（可折叠）
- * - 底部状态栏（可选）
+ * - 底部状态栏
  */
 
-import { useState, useEffect, useRef, ReactNode } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import type { ReactNode } from 'react';
 import { designSystem } from '@/styles/DesignSystem';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 
@@ -39,7 +40,7 @@ const saveSidebarState = (state: SidebarState) => {
 
 interface PageLayoutProps {
   // 顶部工具栏
-  topBar?: ReactNode;
+  topBar: ReactNode;
   topBarHeight?: string;
 
   // 左侧边栏
@@ -61,7 +62,7 @@ interface PageLayoutProps {
   onRightCollapsedChange?: (collapsed: boolean) => void;
 
   // 底部状态栏
-  bottomBar?: ReactNode;
+  bottomBar: ReactNode;
 }
 
 export default function PageLayout({
@@ -200,21 +201,19 @@ export default function PageLayout({
       }}
     >
       {/* 顶部工具栏 */}
-      {topBar && (
-        <div
-          style={{
-            minHeight: topBarHeight,
-            flexShrink: 0,
-            backgroundColor: designSystem.semantic.surface.base,
-            display: 'flex',
-            alignItems: 'center',
-            overflow: 'auto',  // 防止内容溢出，支持横向滚动
-            zIndex: 10,
-          }}
-        >
-          {topBar}
-        </div>
-      )}
+      <div
+        style={{
+          minHeight: topBarHeight,
+          flexShrink: 0,
+          backgroundColor: designSystem.semantic.surface.base,
+          display: 'flex',
+          alignItems: 'center',
+          overflow: 'auto',  // 防止内容溢出，支持横向滚动
+          zIndex: 10,
+        }}
+      >
+        {topBar}
+      </div>
 
       {/* 主体区域 */}
       <div style={{ flex: 1, display: 'flex', minHeight: 0 }}>
@@ -273,23 +272,21 @@ export default function PageLayout({
       </div>
 
       {/* 底部状态栏 */}
-      {bottomBar && (
-        <div
-          style={{
-            flexShrink: 0,
-            boxShadow: designSystem.shadows.xs,
-            display: 'flex',
-            alignItems: 'center',
-            padding: designSystem.spacing[1],  // 8px 最紧凑布局
-            fontSize: designSystem.typography.fontSize.sm,
-            gap: designSystem.spacing[1],  // 8px
-            backgroundColor: designSystem.semantic.surface.base,
-            margin: `0 -${designSystem.spacing[1]} -${designSystem.spacing[1]} -${designSystem.spacing[1]}`,  // 抵消父容器 padding，贴合底部和两边
-          }}
-        >
-          {bottomBar}
-        </div>
-      )}
+      <div
+        style={{
+          flexShrink: 0,
+          boxShadow: designSystem.shadows.xs,
+          display: 'flex',
+          alignItems: 'center',
+          padding: designSystem.spacing[1],  // 8px 最紧凑布局
+          fontSize: designSystem.typography.fontSize.sm,
+          gap: designSystem.spacing[1],  // 8px
+          backgroundColor: designSystem.semantic.surface.base,
+          margin: `0 -${designSystem.spacing[1]} -${designSystem.spacing[1]} -${designSystem.spacing[1]}`,  // 抵消父容器 padding，贴合底部和两边
+        }}
+      >
+        {bottomBar}
+      </div>
     </div>
   );
 }
