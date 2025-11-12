@@ -10,7 +10,7 @@
 
 | 页面类型 | 参考文件 | 包含功能 |
 |---------|---------|---------|
-| **仪表板/概览页** | `src/pages/DashboardPage.tsx` | 统计卡片、图表占位、最近活动列表、左右侧边栏 |
+| **仪表板/大屏展示** | `src/pages/DashboardPage.tsx` | DisplayLayout 全屏布局、统计卡片、图表展示、系统状态监控 |
 | **列表页** | `src/pages/ListPage.tsx` | 搜索筛选、表格、分页、CRUD 操作、卡片/表格切换 |
 | **详情页** | `src/pages/DetailPage.tsx` | Tabs 切换、信息展示、操作按钮、编辑弹窗 |
 | **布局说明页** | `src/pages/LayoutGuidePage.tsx` | MainLayout 和 PageLayout 使用示例 |
@@ -22,6 +22,7 @@
 |---------|---------|---------|
 | **整个应用的外层布局** | `src/layout/MainLayout.tsx` | 侧边栏导航、顶部栏、路由嵌套 |
 | **单个页面的内部布局** | `src/layout/PageLayout.tsx` | 顶部工具栏、左右侧边栏、底部状态栏 |
+| **全屏展示布局** | `src/layout/DisplayLayout.tsx` | 大屏展示、数据可视化、演示模式 |
 | **响应式网格布局** | `src/layout/ResponsiveGrid.tsx` | 统计卡片、产品列表等均匀网格布局 |
 | **标准三段式弹窗** | `src/components/modal/StandardModalLayout.tsx` | Header + Content + Footer 弹窗 |
 | **抽屉式弹窗** | `src/components/modal/DrawerLayout.tsx` | 侧边滑出的 Drawer |
@@ -145,7 +146,61 @@ function MyDetailPage() {
 }
 ```
 
-### 场景 4：添加一个编辑弹窗
+### 场景 4：创建大屏展示页面
+
+**步骤：**
+1. 参考 `src/pages/DashboardPage.tsx`
+2. 使用 `DisplayLayout` 组件
+3. 配置 contentPadding 和 backgroundColor
+4. 顶部栏整合系统状态和操作按钮
+5. 主内容区全屏展示图表和数据
+
+**关键代码：**
+```tsx
+import DisplayLayout from '@/layout/DisplayLayout';
+import { designSystem } from '@/styles';
+
+function MyDashboard() {
+  const topBar = (
+    <div style={{ display: 'flex', gap: designSystem.spacing[2], width: '100%' }}>
+      {/* 左侧：筛选控制 */}
+      <Space>
+        <Select value={filter} onChange={setFilter} />
+      </Space>
+
+      {/* 中间：系统状态 */}
+      <div style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
+        <Tooltip title="CPU"><Progress type="circle" percent={45} size={32} /></Tooltip>
+        <Tooltip title="内存"><Progress type="circle" percent={72} size={32} /></Tooltip>
+      </div>
+
+      {/* 右侧：操作按钮 */}
+      <Space>
+        <Button icon={<ReloadOutlined />}>刷新</Button>
+      </Space>
+    </div>
+  );
+
+  return (
+    <DisplayLayout
+      topBar={topBar}
+      contentPadding={designSystem.spacing[3]}
+      backgroundColor={designSystem.semantic.surface.background}
+    >
+      {/* 统计卡片 */}
+      <Row gutter={[16, 16]}>
+        <Col xs={24} sm={12} lg={6}><StatCard /></Col>
+        <Col xs={24} sm={12} lg={6}><StatCard /></Col>
+      </Row>
+
+      {/* 图表展示 */}
+      <Card><ChartComponent /></Card>
+    </DisplayLayout>
+  );
+}
+```
+
+### 场景 5：添加一个编辑弹窗
 
 **步骤：**
 1. 参考 `src/pages/ModalDemoPage.tsx`
@@ -174,7 +229,7 @@ import { StandardModalLayout } from '@/components/modal';
 </Modal>
 ```
 
-### 场景 5：显示加载状态
+### 场景 6：显示加载状态
 
 **步骤：**
 1. 参考 `src/components/common/LoadingState.tsx`
@@ -194,7 +249,7 @@ import { LoadingState } from '@/components/common';
 {uploading && <LoadingState mode="linear" percent={progress} />}
 ```
 
-### 场景 6：显示空状态
+### 场景 7：显示空状态
 
 **步骤：**
 1. 参考 `src/components/common/EmptyState.tsx`
@@ -214,7 +269,7 @@ import { EmptyState } from '@/components/common';
 {!results.length && <EmptyState type="query" />}
 ```
 
-### 场景 7：使用设计系统的颜色
+### 场景 8：使用设计系统的颜色
 
 **常用颜色速查：**
 ```tsx
@@ -243,7 +298,7 @@ designSystem.colors.error    // #EF4444 红色
 designSystem.colors.info     // #2680C7 蓝色
 ```
 
-### 场景 8：使用设计系统的间距
+### 场景 9：使用设计系统的间距
 
 **常用间距速查：**
 ```tsx
@@ -269,7 +324,7 @@ designSystem.spacing[6]   // 32px - 区域间距
 </Card>
 ```
 
-### 场景 9：配置 Ant Design 主题
+### 场景 10：配置 Ant Design 主题
 
 **步骤：**
 1. 参考 `src/App.tsx`
@@ -302,10 +357,11 @@ antd-template/
 │   ├── layout/                   # 布局组件
 │   │   ├── MainLayout.tsx        # 主布局（侧边栏+导航）
 │   │   ├── PageLayout.tsx        # 页面布局（工具栏+侧边栏）
+│   │   ├── DisplayLayout.tsx     # 全屏展示布局（大屏模式）
 │   │   └── ResponsiveGrid.tsx    # 响应式网格布局
 │   │
 │   ├── pages/                    # 示例页面
-│   │   ├── DashboardPage.tsx     # 仪表板示例
+│   │   ├── DashboardPage.tsx     # 仪表板/大屏展示示例
 │   │   ├── ListPage.tsx          # 列表页示例
 │   │   ├── DetailPage.tsx        # 详情页示例
 │   │   ├── LayoutGuidePage.tsx   # 布局说明
@@ -453,6 +509,12 @@ export default {
 ```
 "参考 src/components/modal/StandardModalLayout.tsx，
 创建一个添加用户的弹窗，包含表单，高度600px"
+```
+
+```
+"参考 src/pages/DashboardPage.tsx，创建一个数据大屏页面，
+使用 DisplayLayout 全屏展示，包含系统状态、统计卡片和图表，
+使用 designSystem.spacing[3] 作为 contentPadding"
 ```
 
 ### ❌ 不好的提示

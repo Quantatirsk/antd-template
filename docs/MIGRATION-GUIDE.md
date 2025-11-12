@@ -260,6 +260,156 @@ function DetailPage() {
 - 示例实现：`src/pages/ListPage.tsx`、`src/pages/DetailPage.tsx`
 - 布局说明：`src/pages/LayoutGuidePage.tsx`
 
+### DisplayLayout（全屏展示布局）
+
+用于大屏展示、数据可视化等需要最大化内容区域的场景。
+
+**何时使用：**
+- ✅ 大屏展示模式（会议室投影、数据看板）
+- ✅ 数据可视化全屏展示
+- ✅ 演示/报表模式
+- ❌ 需要侧边栏导航的管理页面（使用 PageLayout）
+
+**迁移步骤：**
+
+**从 PageLayout 迁移到 DisplayLayout：**
+
+1. **替换布局组件：**
+```tsx
+// 原 PageLayout
+import PageLayout from '@/layout/PageLayout';
+
+<PageLayout
+  topBar={topBar}
+  leftSidebar={leftSidebar}
+  rightSidebar={rightSidebar}
+  bottomBar={bottomBar}
+>
+  {mainContent}
+</PageLayout>
+
+// 改为 DisplayLayout
+import DisplayLayout from '@/layout/DisplayLayout';
+
+<DisplayLayout
+  topBar={topBar}  // 保留顶部操作栏
+  contentPadding={designSystem.spacing[3]}
+  backgroundColor={designSystem.semantic.surface.background}
+>
+  {mainContent}
+</DisplayLayout>
+```
+
+2. **重组侧边栏内容：**
+```tsx
+// 原左侧栏：快速导航
+const leftSidebar = <QuickNavigation />;
+
+// 原右侧栏：系统状态
+const rightSidebar = <SystemStatus />;
+
+// 改为：整合到顶部栏或主内容区
+const topBar = (
+  <div style={{ display: 'flex', gap: designSystem.spacing[2] }}>
+    {/* 左侧：原有操作 */}
+    <FilterControls />
+
+    {/* 中间：系统状态（来自右侧栏） */}
+    <div style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
+      <SystemStatusIndicators />
+    </div>
+
+    {/* 右侧：操作按钮 */}
+    <ActionButtons />
+  </div>
+);
+```
+
+3. **重新布局主内容区：**
+```tsx
+// 原底部栏：统计信息
+const bottomBar = <Statistics />;
+
+// 改为：移至主内容区顶部或底部
+const mainContent = (
+  <div style={{ display: 'flex', flexDirection: 'column', gap: designSystem.spacing[2] }}>
+    {/* 统计信息卡片（来自底部栏） */}
+    <Card><Statistics /></Card>
+
+    {/* 原主内容 */}
+    <ChartsAndData />
+  </div>
+);
+```
+
+**完整示例 - Dashboard 大屏模式：**
+
+```tsx
+import DisplayLayout from '@/layout/DisplayLayout';
+import { designSystem } from '@/styles';
+
+function DashboardPage() {
+  const topBar = (
+    <div style={{ display: 'flex', gap: designSystem.spacing[2], width: '100%' }}>
+      {/* 时间筛选 */}
+      <Space>
+        <Select value={period} onChange={setPeriod} />
+        <DatePicker.RangePicker />
+      </Space>
+
+      {/* 系统状态（来自原右侧栏） */}
+      <div style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
+        <Tooltip title="CPU"><Progress type="circle" percent={45} size={32} /></Tooltip>
+        <Tooltip title="内存"><Progress type="circle" percent={72} size={32} /></Tooltip>
+      </div>
+
+      {/* 操作按钮 */}
+      <Space>
+        <Button icon={<ReloadOutlined />}>刷新</Button>
+        <Button type="primary" icon={<PlusOutlined />}>创建</Button>
+      </Space>
+    </div>
+  );
+
+  return (
+    <DisplayLayout
+      topBar={topBar}
+      contentPadding={designSystem.spacing[3]}
+      backgroundColor={designSystem.semantic.surface.background}
+    >
+      {/* 统计卡片 */}
+      <Row gutter={[16, 16]}>
+        <Col xs={24} sm={12} lg={6}><StatCard {...stat1} /></Col>
+        <Col xs={24} sm={12} lg={6}><StatCard {...stat2} /></Col>
+        <Col xs={24} sm={12} lg={6}><StatCard {...stat3} /></Col>
+        <Col xs={24} sm={12} lg={6}><StatCard {...stat4} /></Col>
+      </Row>
+
+      {/* 今日概览（来自原右侧栏） */}
+      <Card title="今日概览">
+        <Row gutter={[24, 16]}>
+          <Col xs={24} sm={8}><Statistic title="查询次数" value={2340} /></Col>
+          <Col xs={24} sm={8}><Statistic title="活跃用户" value={32} /></Col>
+          <Col xs={24} sm={8}><Statistic title="数据更新" value={15} /></Col>
+        </Row>
+      </Card>
+
+      {/* 图表和活动列表 */}
+      <Row gutter={[16, 16]}>
+        <Col xs={24} lg={16}><ChartCard /></Col>
+        <Col xs={24} lg={8}><DistributionCard /></Col>
+      </Row>
+
+      <ActivityList />
+    </DisplayLayout>
+  );
+}
+```
+
+**参考文件：**
+- 示例实现：`src/pages/DashboardPage.tsx`（DisplayLayout 大屏模式）
+- 布局文档：`docs/DESIGN-GUIDELINES.md` → DisplayLayout 章节
+
 ---
 
 ## 页面迁移
