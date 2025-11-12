@@ -409,6 +409,147 @@ designSystem.borderRadius.full  // '9999px' - 完全圆形
 </PageLayout>
 ```
 
+### DisplayLayout（全屏展示布局）
+
+**功能说明：**
+- 专为大屏展示、数据可视化设计的全屏布局组件
+- 移除侧边栏和底部栏，最大化内容展示区域
+- 提供可选的固定顶部操作栏
+
+**结构：**
+```
+┌──────────────────────────────────┐
+│  TopBar (56px, 可选)             │
+├──────────────────────────────────┤
+│                                  │
+│                                  │
+│        MainContent               │
+│        (全屏展示)                 │
+│                                  │
+│                                  │
+└──────────────────────────────────┘
+```
+
+**尺寸配置：**
+- TopBar 高度：56px（与 MainLayout.Header 一致）
+- MainContent：自动填充剩余空间（100vh 减去 topBar 高度）
+- contentPadding：默认 `0`（可配置）
+- backgroundColor：默认白色（可配置）
+
+**Props 接口：**
+```tsx
+interface DisplayLayoutProps {
+  /** 主内容区 */
+  children: ReactNode;
+
+  /** 可选的顶部操作栏（返回、关闭、全屏切换等） */
+  topBar?: ReactNode;
+
+  /** 主内容区 padding，默认 0（适合大屏展示） */
+  contentPadding?: string;
+
+  /** 背景色，默认白色 */
+  backgroundColor?: string;
+}
+```
+
+**使用场景：**
+```tsx
+import DisplayLayout from '@/layout/DisplayLayout';
+
+// ✅ 大屏数据展示
+<DisplayLayout
+  topBar={<TopActions />}
+  contentPadding={designSystem.spacing[3]}
+  backgroundColor={designSystem.semantic.surface.background}
+>
+  <DashboardCharts />
+</DisplayLayout>
+
+// ✅ 数据可视化全屏
+<DisplayLayout>
+  <DataVisualization />
+</DisplayLayout>
+
+// ✅ 演示/投影模式
+<DisplayLayout
+  topBar={
+    <Space>
+      <Button icon={<CloseOutlined />}>退出</Button>
+      <Button icon={<FullscreenOutlined />}>全屏</Button>
+    </Space>
+  }
+>
+  <PresentationContent />
+</DisplayLayout>
+```
+
+**何时使用：**
+- ✅ 大屏展示模式（会议室大屏、演示投影）
+- ✅ 数据可视化看板（纯展示场景）
+- ✅ 数据图表全屏查看
+- ✅ 报表打印预览
+- ❌ 需要侧边栏导航的工作台（使用 PageLayout）
+- ❌ 需要复杂交互的管理页面（使用 PageLayout）
+
+**与 PageLayout 对比：**
+| 特性 | PageLayout | DisplayLayout |
+|------|------------|---------------|
+| 用途 | 工作台/管理页面 | 全屏展示/大屏 |
+| 侧边栏 | 支持左右侧边栏 | 无侧边栏 |
+| 底部栏 | 支持 | 无 |
+| 默认 padding | 由页面控制 | 默认 0 |
+| 响应式 | 复杂（三栏折叠） | 简单（纯内容） |
+| 最佳场景 | 数据管理、表单编辑 | 数据展示、可视化 |
+
+**实战示例 - Dashboard 大屏模式：**
+```tsx
+export default function DashboardPage() {
+  const topBar = (
+    <div style={{ display: 'flex', gap: designSystem.spacing[2], width: '100%' }}>
+      {/* 左侧：时间筛选 */}
+      <Space>
+        <Select value={timePeriod} onChange={setTimePeriod} />
+        <DatePicker.RangePicker />
+      </Space>
+
+      {/* 中间：系统状态指示器 */}
+      <div style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
+        <Tooltip title="CPU 使用率">
+          <Progress type="circle" percent={45} size={32} />
+        </Tooltip>
+        <Tooltip title="内存使用率">
+          <Progress type="circle" percent={72} size={32} />
+        </Tooltip>
+      </div>
+
+      {/* 右侧：操作按钮 */}
+      <Space>
+        <Button icon={<ReloadOutlined />}>刷新</Button>
+        <Button type="primary" icon={<PlusOutlined />}>创建</Button>
+      </Space>
+    </div>
+  );
+
+  return (
+    <DisplayLayout
+      topBar={topBar}
+      contentPadding={designSystem.spacing[3]}
+      backgroundColor={designSystem.semantic.surface.background}
+    >
+      {/* 统计卡片、图表、数据展示 */}
+      <DashboardContent />
+    </DisplayLayout>
+  );
+}
+```
+
+**设计原则：**
+- **最小化干扰**：移除所有非必要 UI 元素，专注内容展示
+- **充分利用空间**：全屏展示，适合投影和大屏设备
+- **可选顶部栏**：提供必要的操作入口（退出、刷新、筛选等）
+- **灵活配置**：支持自定义 padding 和背景色，适应不同场景
+
 ### ResponsiveGrid（响应式网格）
 
 **功能说明：**
@@ -593,9 +734,9 @@ import { designSystem } from '@/styles';
 
 ### 参考页面
 - 布局说明：`src/pages/LayoutGuidePage.tsx`
-- 仪表板示例：`src/pages/DashboardPage.tsx`
-- 列表页示例：`src/pages/ListPage.tsx`
-- 详情页示例：`src/pages/DetailPage.tsx`
+- 仪表板示例（DisplayLayout）：`src/pages/DashboardPage.tsx`
+- 列表页示例（PageLayout）：`src/pages/ListPage.tsx`
+- 详情页示例（PageLayout）：`src/pages/DetailPage.tsx`
 - 弹窗示例：`src/pages/ModalDemoPage.tsx`
 
 ### 相关文档
