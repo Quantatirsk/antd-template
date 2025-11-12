@@ -22,6 +22,7 @@
 |---------|---------|---------|
 | **整个应用的外层布局** | `src/layout/MainLayout.tsx` | 侧边栏导航、顶部栏、路由嵌套 |
 | **单个页面的内部布局** | `src/layout/PageLayout.tsx` | 顶部工具栏、左右侧边栏、底部状态栏 |
+| **响应式网格布局** | `src/layout/ResponsiveGrid.tsx` | 统计卡片、产品列表等均匀网格布局 |
 | **标准三段式弹窗** | `src/components/modal/StandardModalLayout.tsx` | Header + Content + Footer 弹窗 |
 | **抽屉式弹窗** | `src/components/modal/DrawerLayout.tsx` | 侧边滑出的 Drawer |
 | **向导式弹窗** | `src/components/modal/WizardModalLayout.tsx` | 多步骤操作流程 |
@@ -49,7 +50,38 @@
 
 ## 📖 常见场景速查
 
-### 场景 1：创建一个列表页
+### 场景 1：创建响应式卡片网格
+
+**步骤：**
+1. 导入 `ResponsiveGrid` 组件
+2. 定义响应式列数配置
+3. 传入卡片子元素数组
+
+**关键代码：**
+```tsx
+import { ResponsiveGrid } from '@/layout';
+import { Card, Statistic } from 'antd';
+
+function StatisticsGrid() {
+  const stats = [
+    { title: '总用户数', value: 1234 },
+    { title: '今日访问', value: 567 },
+    { title: '订单总数', value: 890 },
+  ];
+
+  return (
+    <ResponsiveGrid columns={{ xs: 1, sm: 2, lg: 4 }}>
+      {stats.map((stat, index) => (
+        <Card key={index}>
+          <Statistic title={stat.title} value={stat.value} />
+        </Card>
+      ))}
+    </ResponsiveGrid>
+  );
+}
+```
+
+### 场景 2：创建一个列表页
 
 **步骤：**
 1. 参考 `src/pages/ListPage.tsx`
@@ -81,7 +113,7 @@ function MyListPage() {
 }
 ```
 
-### 场景 2：创建一个详情页
+### 场景 3：创建一个详情页
 
 **步骤：**
 1. 参考 `src/pages/DetailPage.tsx`
@@ -113,7 +145,7 @@ function MyDetailPage() {
 }
 ```
 
-### 场景 3：添加一个编辑弹窗
+### 场景 4：添加一个编辑弹窗
 
 **步骤：**
 1. 参考 `src/pages/ModalDemoPage.tsx`
@@ -142,7 +174,7 @@ import { StandardModalLayout } from '@/components/modal';
 </Modal>
 ```
 
-### 场景 4：显示加载状态
+### 场景 5：显示加载状态
 
 **步骤：**
 1. 参考 `src/components/common/LoadingState.tsx`
@@ -162,7 +194,7 @@ import { LoadingState } from '@/components/common';
 {uploading && <LoadingState mode="linear" percent={progress} />}
 ```
 
-### 场景 5：显示空状态
+### 场景 6：显示空状态
 
 **步骤：**
 1. 参考 `src/components/common/EmptyState.tsx`
@@ -182,7 +214,7 @@ import { EmptyState } from '@/components/common';
 {!results.length && <EmptyState type="query" />}
 ```
 
-### 场景 6：使用设计系统的颜色
+### 场景 7：使用设计系统的颜色
 
 **常用颜色速查：**
 ```tsx
@@ -211,7 +243,7 @@ designSystem.colors.error    // #EF4444 红色
 designSystem.colors.info     // #2680C7 蓝色
 ```
 
-### 场景 7：使用设计系统的间距
+### 场景 8：使用设计系统的间距
 
 **常用间距速查：**
 ```tsx
@@ -237,7 +269,7 @@ designSystem.spacing[6]   // 32px - 区域间距
 </Card>
 ```
 
-### 场景 8：配置 Ant Design 主题
+### 场景 9：配置 Ant Design 主题
 
 **步骤：**
 1. 参考 `src/App.tsx`
@@ -269,7 +301,8 @@ antd-template/
 ├── src/
 │   ├── layout/                   # 布局组件
 │   │   ├── MainLayout.tsx        # 主布局（侧边栏+导航）
-│   │   └── PageLayout.tsx        # 页面布局（工具栏+侧边栏）
+│   │   ├── PageLayout.tsx        # 页面布局（工具栏+侧边栏）
+│   │   └── ResponsiveGrid.tsx    # 响应式网格布局
 │   │
 │   ├── pages/                    # 示例页面
 │   │   ├── DashboardPage.tsx     # 仪表板示例

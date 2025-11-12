@@ -510,6 +510,7 @@ export default function LayoutGuidePage() {
             <div style={{ color: designSystem.semantic.text.secondary, marginTop: designSystem.spacing[0.5] }}>
               • MainLayout - 全局框架<br/>
               • PageLayout - 页面组织<br/>
+              • ResponsiveGrid - 网格布局<br/>
               • StandardModalLayout<br/>
               • DrawerLayout<br/>
               • WizardModalLayout

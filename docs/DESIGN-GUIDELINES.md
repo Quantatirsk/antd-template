@@ -409,6 +409,75 @@ designSystem.borderRadius.full  // '9999px' - 完全圆形
 </PageLayout>
 ```
 
+### ResponsiveGrid（响应式网格）
+
+**功能说明：**
+- 基于 Ant Design Grid 系统的封装组件
+- 自动计算列数和响应式布局
+- 简化卡片网格的创建
+
+**结构：**
+```tsx
+import { ResponsiveGrid } from '@/layout';
+
+<ResponsiveGrid
+  columns={{ xs: 1, sm: 2, md: 3, lg: 4 }}
+  gutter={[16, 16]}
+>
+  {items.map(item => <Card key={item.id}>{item.content}</Card>)}
+</ResponsiveGrid>
+```
+
+**Props 配置：**
+- `children`: ReactNode[] - 子元素数组
+- `columns`: 各断点列数配置
+  - `xs`: < 576px（默认 1）
+  - `sm`: ≥ 576px（默认 2）
+  - `md`: ≥ 768px（默认 3）
+  - `lg`: ≥ 992px（默认 4）
+  - `xl`: ≥ 1200px（默认继承 lg）
+- `gutter`: 间距配置（默认 `[8, 8]`）
+
+**使用场景：**
+```tsx
+// ✅ 统计卡片网格
+<ResponsiveGrid columns={{ xs: 1, sm: 2, lg: 4 }}>
+  {stats.map(stat => (
+    <Card key={stat.id}>
+      <Statistic {...stat} />
+    </Card>
+  ))}
+</ResponsiveGrid>
+
+// ✅ 产品卡片网格
+<ResponsiveGrid columns={{ xs: 1, sm: 2, md: 3 }}>
+  {products.map(product => (
+    <ProductCard key={product.id} {...product} />
+  ))}
+</ResponsiveGrid>
+
+// ✅ vs 直接使用 Row/Col（更简洁）
+// 传统方式
+<Row gutter={[16, 16]}>
+  {items.map(item => (
+    <Col xs={24} sm={12} md={8} lg={6} key={item.id}>
+      <Card>{item.content}</Card>
+    </Col>
+  ))}
+</Row>
+
+// ResponsiveGrid 方式
+<ResponsiveGrid columns={{ xs: 1, sm: 2, md: 3, lg: 4 }}>
+  {items.map(item => <Card key={item.id}>{item.content}</Card>)}
+</ResponsiveGrid>
+```
+
+**何时使用：**
+- ✅ 需要快速创建响应式卡片网格
+- ✅ 列数规则统一且简单
+- ❌ 需要复杂的列宽控制（使用 Row/Col）
+- ❌ 需要不同项目占据不同列宽（使用 Row/Col）
+
 ---
 
 ## Ant Design Token 配置
