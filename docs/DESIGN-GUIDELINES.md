@@ -391,6 +391,212 @@ designSystem.borderRadius.full  // '9999px' - 完全圆形
 - MainContent：**由 PageLayout 的 `contentPadding` prop 统一控制**
 - BottomBar：`8px`
 
+### 容器页模式（Container + Children Pattern）
+
+**核心原则：避免 PageLayout 嵌套**
+
+容器页模式适用于需要统一导航的多功能模块系统。
+
+**三栏职责划分：**
+- **左侧栏**：子模块导航菜单（固定）
+- **中间区域**：当前子模块的页面内容（通过 Outlet 渲染）
+- **右侧栏**：根据当前子模块和页面状态动态显示相关信息
+
+**实现要点：**
+
+**1. 容器页（使用 PageLayout）**
+```tsx
+import PageLayout from '@/layout/PageLayout';
+import { useModuleStore } from '@/store/moduleStore';
+import { SubModule1Sidebar, SubModule2Sidebar } from './SubModulePages';
+
+export default function ModuleContainer() {
+  const { activeModule, leftCollapsed, rightCollapsed } = useModuleStore();
+
+  // 左侧：固定的功能菜单
+  const leftSidebar = (
+    <Menu mode="inline" selectedKeys={[activeModule]} items={menuConfig} />
+  );
+
+  // 右侧：根据当前模块动态切换
+  const rightSidebar = (() => {
+    switch (activeModule) {
+      case 'sub1': return <SubModule1Sidebar />;
+      case 'sub2': return <SubModule2Sidebar />;
+      default: return undefined;
+    }
+  })();
+
+  return (
+    <PageLayout
+      leftSidebar={leftSidebar}
+      rightSidebar={rightSidebar}
+      leftDefaultCollapsed={leftCollapsed}
+      rightDefaultCollapsed={rightCollapsed}
+      contentPadding={designSystem.spacing[1]}
+    >
+      <Outlet />  {/* 子页面在此渲染 */}
+    </PageLayout>
+  );
+}
+```
+
+**2. 子页面（不使用 PageLayout）**
+```tsx
+import { useModuleStore } from '@/store/moduleStore';
+
+// 导出 Sidebar 组件
+export function SubModule1Sidebar() {
+  const { selectedItemId } = useModuleStore();
+  // 根据选中状态显示相关信息
+  return <Card>详情: {selectedItemId}</Card>;
+}
+
+// 子页面主组件
+export default function SubModule1Page() {
+  const { selectItem } = useModuleStore();
+
+  return (
+    <div style={{ height: '100%', display: 'flex', flexDirection: 'column', gap: designSystem.spacing[1] }}>
+      <Card><Input.Search /></Card>
+      <Card style={{ flex: 1 }}>
+        <Table onRow={(record) => ({ onClick: () => selectItem(record.id) })} />
+      </Card>
+    </div>
+  );
+}
+```
+
+**3. 状态管理（Zustand）**
+```tsx
+// src/store/moduleStore.ts
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
+
+export const useModuleStore = create()(persist(
+  (set) => ({
+    selectedItemId: null,
+    activeModule: 'sub1',
+    leftCollapsed: false,
+    rightCollapsed: false,
+    selectItem: (id) => set({ selectedItemId: id }),
+    setActiveModule: (module) => set({ activeModule: module }),
+  }),
+  { name: 'module-storage' }
+));
+```
+
+**联动机制：**
+1. 用户在子页面点击项目 → `selectItem(id)` 更新 store
+2. `SubModule1Sidebar` 监听 `selectedItemId` 变化
+3. 右侧栏自动更新显示该项目的详情
+
+**使用场景：**
+- ✅ 多模块系统（文档比对、知识图谱、数据管理等）
+- ✅ 需要统一的子模块导航和状态共享
+- ✅ 右侧栏需要根据页面操作实时联动
+
+**完整示例：**`src/pages/module/`
+
+#### 子页面 Padding 对齐规范（重要）
+
+**核心原则：**
+1. **所有布局容器都用 Card 包裹** - 保持左右边距一致
+2. **避免 Card 嵌套 Card** - 如果只有一个主要内容，不需要外层 Card
+3. **内容卡片可以嵌套** - Tabs 或可滚动区域内部的内容卡片（详细信息、统计信息等）可以嵌套
+
+**正确示例：**
+
+```tsx
+// ✅ 正确：多个布局容器，每个都用 Card
+export default function ListPage() {
+  return (
+    <div style={{ height: '100%', display: 'flex', flexDirection: 'column', gap: designSystem.spacing[1] }}>
+      {/* 顶部工具栏 */}
+      <Card size="small" style={{ borderRadius: designSystem.borderRadius.lg }}>
+        <Input.Search />
+      </Card>
+
+      {/* 主内容区 - 表格 */}
+      <Card
+        size="small"
+        style={{ flex: 1, borderRadius: designSystem.borderRadius.lg, minHeight: 0 }}
+        styles={{ body: { padding: designSystem.spacing[1], overflow: 'hidden' } }}
+      >
+        <Table />
+      </Card>
+    </div>
+  );
+}
+
+// ✅ 正确：Tabs 内的内容卡片可以嵌套
+export default function DetailPage() {
+  return (
+    <div style={{ height: '100%', display: 'flex', flexDirection: 'column', gap: designSystem.spacing[1] }}>
+      {/* 顶部工具栏 */}
+      <Card size="small" style={{ borderRadius: designSystem.borderRadius.lg }}>
+        <div>操作按钮</div>
+      </Card>
+
+      {/* 主内容区 - Tabs */}
+      <Card size="small" style={{ flex: 1, borderRadius: designSystem.borderRadius.lg, minHeight: 0 }}>
+        <Tabs items={[
+          {
+            key: 'basic',
+            label: '基本信息',
+            children: (
+              <div style={{ padding: designSystem.spacing[1] }}>
+                {/* 内容卡片，不是布局嵌套 */}
+                <Card size="small" title="详细信息"><Descriptions /></Card>
+                <Card size="small" title="统计信息"><Statistics /></Card>
+              </div>
+            ),
+          },
+        ]} />
+      </Card>
+    </div>
+  );
+}
+
+// ❌ 错误：主内容区没有 Card 包裹
+export default function BadPage() {
+  return (
+    <div style={{ height: '100%', display: 'flex', flexDirection: 'column', gap: designSystem.spacing[1] }}>
+      <Card size="small"><Input.Search /></Card>
+
+      {/* 直接用 div，左右边距与上面的 Card 不一致 */}
+      <div style={{ flex: 1, padding: designSystem.spacing[1] }}>
+        <Table />
+      </div>
+    </div>
+  );
+}
+
+// ❌ 错误：Card 嵌套 Card（布局层面）
+export default function BadPage2() {
+  return (
+    <div style={{ height: '100%', display: 'flex', flexDirection: 'column', gap: designSystem.spacing[1] }}>
+      <Card size="small"><Input.Search /></Card>
+
+      {/* 外层 Card */}
+      <Card size="small" style={{ flex: 1 }}>
+        {/* 内层 Card - 多余的嵌套 */}
+        <Card size="small">
+          <Table />
+        </Card>
+      </Card>
+    </div>
+  );
+}
+```
+
+**关键点：**
+1. **布局容器（顶部工具栏、主内容区等）都用 Card** - 保持左右边距一致
+2. **避免布局 Card 嵌套** - 不要在 Card 里再包一层 Card
+3. **统一使用 `size="small"`** - 保持一致的内边距
+4. **统一使用 `borderRadius: designSystem.borderRadius.lg`** - 保持一致的圆角
+5. **内容卡片可以嵌套** - Tabs/可滚动区域内的卡片（详细信息、统计卡片等）是内容，不是布局嵌套
+
 ### 页面开发规范（重要）
 
 **核心原则：使用 `contentPadding` prop，不在页面内部添加 padding**
@@ -728,11 +934,14 @@ import { designSystem } from '@/styles';
 - 全局样式：`src/styles/GlobalStyles.tsx`
 
 ### 参考页面
-- 布局说明：`src/pages/LayoutGuidePage.tsx`
 - 仪表板示例（DisplayLayout）：`src/pages/DashboardPage.tsx`
-- 列表页示例（PageLayout）：`src/pages/ListPage.tsx`
-- 详情页示例（PageLayout）：`src/pages/DetailPage.tsx`
-- 弹窗示例：`src/pages/ModalDemoPage.tsx`
+- 模块系统（容器页模式）：`src/pages/module/`
+  - 容器页：`src/pages/module/ModuleContainerPage.tsx`
+  - 数据管理：`src/pages/module/SubModule1Page.tsx`（访问路径：`/module/data`）
+  - 列表页示例：`src/pages/module/ListPage.tsx`（访问路径：`/module/list`）
+  - 详情页示例：`src/pages/module/DetailPage.tsx`（访问路径：`/module/detail`）
+  - 布局说明：`src/pages/module/LayoutGuidePage.tsx`（访问路径：`/module/layout`）
+  - 弹窗示例：`src/pages/module/ModalDemoPage.tsx`（访问路径：`/module/modal`）
 
 ### 相关文档
 - [迁移指南](./MIGRATION-GUIDE.md)

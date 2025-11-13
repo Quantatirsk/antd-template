@@ -12,12 +12,9 @@ import { Layout, Menu, Button, Drawer, Tooltip } from 'antd';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import {
   DashboardOutlined,
-  UnorderedListOutlined,
-  FileTextOutlined,
   MenuOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
-  LayoutOutlined,
   AppstoreOutlined,
 } from '@ant-design/icons';
 import { designSystem } from '@/styles/DesignSystem';
@@ -57,28 +54,19 @@ export default function MainLayout() {
       label: '仪表板',
     },
     {
-      key: '/list',
-      icon: <UnorderedListOutlined />,
-      label: '列表页',
-    },
-    {
-      key: '/detail',
-      icon: <FileTextOutlined />,
-      label: '详情页',
-    },
-    {
-      key: '/layout-guide',
-      icon: <LayoutOutlined />,
-      label: '布局说明',
-    },
-    {
-      key: '/modal-demo',
+      key: '/module',
       icon: <AppstoreOutlined />,
-      label: '弹窗演示',
+      label: '模块系统',
     },
   ];
 
-  const selectedKey = location.pathname === '/' ? '/dashboard' : location.pathname;
+  // 处理模块系统子路由的高亮
+  const getSelectedKey = () => {
+    if (location.pathname === '/') return '/dashboard';
+    if (location.pathname.startsWith('/module')) return '/module';
+    return location.pathname;
+  };
+  const selectedKey = getSelectedKey();
 
   // 根据路由获取页面标题
   const getPageTitle = () => {

@@ -11,10 +11,14 @@ import { LoadingState } from '@/components/common';
 // ==================== 组件懒加载 ====================
 
 const DashboardPage = lazy(() => import('@/pages/DashboardPage'));
-const ListPage = lazy(() => import('@/pages/ListPage'));
-const DetailPage = lazy(() => import('@/pages/DetailPage'));
-const LayoutGuidePage = lazy(() => import('@/pages/LayoutGuidePage'));
-const ModalDemoPage = lazy(() => import('@/pages/ModalDemoPage'));
+
+// 模块系统（容器页模式演示）
+const ModuleContainerPage = lazy(() => import('@/pages/module/ModuleContainerPage'));
+const SubModule1Page = lazy(() => import('@/pages/module/SubModule1Page'));
+const ModuleListPage = lazy(() => import('@/pages/module/ListPage'));
+const ModuleDetailPage = lazy(() => import('@/pages/module/DetailPage'));
+const ModuleLayoutGuidePage = lazy(() => import('@/pages/module/LayoutGuidePage'));
+const ModuleModalDemoPage = lazy(() => import('@/pages/module/ModalDemoPage'));
 
 // ==================== 布局组件 ====================
 
@@ -50,37 +54,60 @@ export const router = createBrowserRouter([
           </Suspense>
         ),
       },
+      // 模块系统（容器页模式演示）
       {
-        path: 'list',
+        path: 'module',
         element: (
           <Suspense fallback={<PageLoading />}>
-            <ListPage />
+            <ModuleContainerPage />
           </Suspense>
         ),
-      },
-      {
-        path: 'detail',
-        element: (
-          <Suspense fallback={<PageLoading />}>
-            <DetailPage />
-          </Suspense>
-        ),
-      },
-      {
-        path: 'layout-guide',
-        element: (
-          <Suspense fallback={<PageLoading />}>
-            <LayoutGuidePage />
-          </Suspense>
-        ),
-      },
-      {
-        path: 'modal-demo',
-        element: (
-          <Suspense fallback={<PageLoading />}>
-            <ModalDemoPage />
-          </Suspense>
-        ),
+        children: [
+          {
+            index: true,
+            element: <Navigate to="/module/data" replace />,
+          },
+          {
+            path: 'data',
+            element: (
+              <Suspense fallback={<PageLoading />}>
+                <SubModule1Page />
+              </Suspense>
+            ),
+          },
+          {
+            path: 'list',
+            element: (
+              <Suspense fallback={<PageLoading />}>
+                <ModuleListPage />
+              </Suspense>
+            ),
+          },
+          {
+            path: 'detail',
+            element: (
+              <Suspense fallback={<PageLoading />}>
+                <ModuleDetailPage />
+              </Suspense>
+            ),
+          },
+          {
+            path: 'layout',
+            element: (
+              <Suspense fallback={<PageLoading />}>
+                <ModuleLayoutGuidePage />
+              </Suspense>
+            ),
+          },
+          {
+            path: 'modal',
+            element: (
+              <Suspense fallback={<PageLoading />}>
+                <ModuleModalDemoPage />
+              </Suspense>
+            ),
+          },
+        ],
       },
     ],
   },

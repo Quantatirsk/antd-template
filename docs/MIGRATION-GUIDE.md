@@ -159,7 +159,7 @@ import { designSystem } from '@/styles';
 <BrowserRouter>
   <Routes>
     <Route path="/" element={<Dashboard />} />
-    <Route path="/list" element={<ListPage />} />
+    <Route path="/module/list" element={<ListPage />} />
   </Routes>
 </BrowserRouter>
 
@@ -172,7 +172,17 @@ const router = createBrowserRouter([
     element: <MainLayout />,
     children: [
       { path: 'dashboard', element: <Dashboard /> },
-      { path: 'list', element: <ListPage /> },
+      {
+        path: 'module',
+        element: <ModuleContainerPage />,
+        children: [
+          { path: 'data', element: <SubModule1Page /> },
+          { path: 'list', element: <ListPage /> },
+          { path: 'detail', element: <DetailPage /> },
+          { path: 'layout', element: <LayoutGuidePage /> },
+          { path: 'modal', element: <ModalDemoPage /> },
+        ],
+      },
     ],
   },
 ]);
@@ -257,8 +267,96 @@ function DetailPage() {
 ```
 
 **参考文件：**
-- 示例实现：`src/pages/ListPage.tsx`、`src/pages/DetailPage.tsx`
-- 布局说明：`src/pages/LayoutGuidePage.tsx`
+- 示例实现：`src/pages/module/ListPage.tsx`、`src/pages/module/DetailPage.tsx`
+- 布局说明：`src/pages/module/LayoutGuidePage.tsx`
+
+### 容器页模式（多模块系统）
+
+**适用场景：**需要统一导航的多功能模块系统，如文档比对、知识图谱、数据管理等。
+
+**核心特点：**
+- 容器页使用 PageLayout，子页面不使用
+- 右侧栏根据当前模块和页面状态动态联动
+- 通过 Zustand store 实现跨页面状态共享
+
+**迁移步骤：**
+
+**1. 创建状态管理 store**
+```tsx
+// src/store/moduleStore.ts
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
+
+export const useModuleStore = create()(persist(
+  (set) => ({
+    selectedItemId: null,
+    activeModule: 'sub1',
+    selectItem: (id) => set({ selectedItemId: id }),
+  }),
+  { name: 'module-storage' }
+));
+```
+
+**2. 创建容器页（使用 PageLayout）**
+```tsx
+// src/pages/module/ModuleContainerPage.tsx
+export default function ModuleContainer() {
+  const { activeModule } = useModuleStore();
+
+  const leftSidebar = <Menu selectedKeys={[activeModule]} />;
+
+  // 动态右侧栏
+  const rightSidebar = (() => {
+    switch (activeModule) {
+      case 'sub1': return <SubModule1Sidebar />;
+      case 'sub2': return <SubModule2Sidebar />;
+    }
+  })();
+
+  return (
+    <PageLayout leftSidebar={leftSidebar} rightSidebar={rightSidebar}>
+      <Outlet />
+    </PageLayout>
+  );
+}
+```
+
+**3. 创建子页面（不使用 PageLayout）**
+```tsx
+// src/pages/module/SubModule1Page.tsx
+
+// 导出 Sidebar 组件
+export function SubModule1Sidebar() {
+  const { selectedItemId } = useModuleStore();
+  return <Card>详情: {selectedItemId}</Card>;
+}
+
+// 子页面主组件
+export default function SubModule1Page() {
+  const { selectItem } = useModuleStore();
+
+  return (
+    <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+      <Card><Table onRow={(r) => ({ onClick: () => selectItem(r.id) })} /></Card>
+    </div>
+  );
+}
+```
+
+**4. 配置嵌套路由**
+```tsx
+// src/router/index.tsx
+{
+  path: 'module',
+  element: <ModuleContainerPage />,
+  children: [
+    { path: 'sub1', element: <SubModule1Page /> },
+    { path: 'sub2', element: <SubModule2Page /> },
+  ],
+}
+```
+
+**参考文件：**`src/pages/module/`、`src/store/moduleStore.ts`
 
 ### DisplayLayout（全屏展示布局）
 
@@ -416,7 +514,7 @@ import { StandardModalLayout } from '@/components/modal';
 ```
 
 **参考文件：**
-- `src/pages/ModalDemoPage.tsx` - 完整弹窗示例
+- `src/pages/module/ModalDemoPage.tsx` - 完整弹窗示例
 - `src/components/modal/` - 弹窗布局组件
 
 ### 加载状态
@@ -545,7 +643,10 @@ function MyPage() {
 
 - 查看 [RefIndexing.md](./RefIndexing.md) 获取快速参考索引
 - 查看 [DESIGN-GUIDELINES.md](./DESIGN-GUIDELINES.md) 了解详细设计规范
-- 参考示例页面：`src/pages/DashboardPage.tsx`、`src/pages/ListPage.tsx`、`src/pages/DetailPage.tsx`
+- 参考示例页面：
+  - `src/pages/DashboardPage.tsx` - 仪表板示例
+  - `src/pages/module/ListPage.tsx` - 列表页示例
+  - `src/pages/module/DetailPage.tsx` - 详情页示例
 
 ---
 
@@ -553,5 +654,5 @@ function MyPage() {
 
 如有问题，请：
 1. 查看示例页面源码
-2. 参考 `src/pages/LayoutGuidePage.tsx` 布局说明
+2. 参考 `src/pages/module/LayoutGuidePage.tsx` 布局说明
 3. 检查 `src/styles/DesignSystem.ts` 设计系统配置

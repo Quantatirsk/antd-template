@@ -11,10 +11,11 @@
 | 页面类型 | 参考文件 | 包含功能 |
 |---------|---------|---------|
 | **仪表板/大屏展示** | `src/pages/DashboardPage.tsx` | DisplayLayout 全屏布局、统计卡片、图表展示、系统状态监控 |
-| **列表页** | `src/pages/ListPage.tsx` | 搜索筛选、表格、分页、CRUD 操作、卡片/表格切换 |
-| **详情页** | `src/pages/DetailPage.tsx` | Tabs 切换、信息展示、操作按钮、编辑弹窗 |
-| **布局说明页** | `src/pages/LayoutGuidePage.tsx` | MainLayout 和 PageLayout 使用示例 |
-| **弹窗演示页** | `src/pages/ModalDemoPage.tsx` | 标准弹窗、抽屉、向导式弹窗 |
+| **列表页** | `src/pages/module/ListPage.tsx` | 搜索筛选、表格、分页、CRUD 操作、卡片/表格切换 |
+| **详情页** | `src/pages/module/DetailPage.tsx` | Tabs 切换、信息展示、操作按钮、编辑弹窗 |
+| **模块系统（容器页模式）** | `src/pages/module/` | 容器页、子模块、动态右侧栏联动、状态管理（Zustand） |
+| **布局说明页** | `src/pages/module/LayoutGuidePage.tsx` | MainLayout 和 PageLayout 使用示例 |
+| **弹窗演示页** | `src/pages/module/ModalDemoPage.tsx` | 标准弹窗、抽屉、向导式弹窗 |
 
 ### 使用某种布局
 
@@ -22,6 +23,7 @@
 |---------|---------|---------|
 | **整个应用的外层布局** | `src/layout/MainLayout.tsx` | 侧边栏导航、顶部栏、路由嵌套 |
 | **单个页面的内部布局** | `src/layout/PageLayout.tsx` | 顶部工具栏、左右侧边栏、底部状态栏 |
+| **容器页模式（多模块）** | `src/pages/module/ModuleContainerPage.tsx` | 多功能模块系统，统一导航，动态右侧栏联动 |
 | **全屏展示布局** | `src/layout/DisplayLayout.tsx` | 大屏展示、数据可视化、演示模式 |
 | **响应式网格布局** | `src/layout/ResponsiveGrid.tsx` | 统计卡片、产品列表等均匀网格布局 |
 | **标准三段式弹窗** | `src/components/modal/StandardModalLayout.tsx` | Header + Content + Footer 弹窗 |
@@ -85,7 +87,7 @@ function StatisticsGrid() {
 ### 场景 2：创建一个列表页
 
 **步骤：**
-1. 参考 `src/pages/ListPage.tsx`
+1. 参考 `src/pages/module/ListPage.tsx`
 2. 使用 `PageLayout` 组件
 3. 添加 topBar（搜索/筛选）
 4. 添加 leftSidebar（分类）
@@ -117,7 +119,7 @@ function MyListPage() {
 ### 场景 3：创建一个详情页
 
 **步骤：**
-1. 参考 `src/pages/DetailPage.tsx`
+1. 参考 `src/pages/module/DetailPage.tsx`
 2. 使用 `PageLayout` 组件
 3. 使用 `contentPadding={designSystem.spacing[1]}`
 4. 使用 `Tabs` 组织内容
@@ -200,10 +202,73 @@ function MyDashboard() {
 }
 ```
 
+### 场景 11：创建多模块系统（容器页模式）
+
+**步骤：**
+1. 创建 Zustand store 管理状态
+2. 创建容器页（使用 PageLayout）
+3. 创建子模块页面（不使用 PageLayout）
+4. 每个子模块导出对应的 Sidebar 组件
+5. 配置嵌套路由
+
+**关键代码：**
+```tsx
+// 1. 状态管理
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
+
+export const useModuleStore = create()(persist(
+  (set) => ({
+    selectedItemId: null,
+    activeModule: 'sub1',
+    selectItem: (id) => set({ selectedItemId: id }),
+  }),
+  { name: 'module-storage' }
+));
+
+// 2. 容器页
+export default function ModuleContainer() {
+  const { activeModule } = useModuleStore();
+
+  const rightSidebar = (() => {
+    switch (activeModule) {
+      case 'sub1': return <SubModule1Sidebar />;
+      case 'sub2': return <SubModule2Sidebar />;
+    }
+  })();
+
+  return (
+    <PageLayout leftSidebar={<Menu />} rightSidebar={rightSidebar}>
+      <Outlet />
+    </PageLayout>
+  );
+}
+
+// 3. 子模块页面
+export function SubModule1Sidebar() {
+  const { selectedItemId } = useModuleStore();
+  return <Card>详情: {selectedItemId}</Card>;
+}
+
+export default function SubModule1Page() {
+  const { selectItem } = useModuleStore();
+  return (
+    <div style={{ height: '100%' }}>
+      <Card><Table onRow={(r) => ({ onClick: () => selectItem(r.id) })} /></Card>
+    </div>
+  );
+}
+```
+
+**参考文件：**
+- `src/pages/module/ModuleContainerPage.tsx`
+- `src/pages/module/SubModule1Page.tsx`
+- `src/store/moduleStore.ts`
+
 ### 场景 5：添加一个编辑弹窗
 
 **步骤：**
-1. 参考 `src/pages/ModalDemoPage.tsx`
+1. 参考 `src/pages/module/ModalDemoPage.tsx`
 2. 使用 `StandardModalLayout` 组件
 3. 包裹在 `Modal` 中
 
@@ -362,10 +427,13 @@ antd-template/
 │   │
 │   ├── pages/                    # 示例页面
 │   │   ├── DashboardPage.tsx     # 仪表板/大屏展示示例
-│   │   ├── ListPage.tsx          # 列表页示例
-│   │   ├── DetailPage.tsx        # 详情页示例
-│   │   ├── LayoutGuidePage.tsx   # 布局说明
-│   │   └── ModalDemoPage.tsx     # 弹窗示例
+│   │   └── module/               # 模块系统示例
+│   │       ├── ModuleContainerPage.tsx  # 容器页
+│   │       ├── SubModule1Page.tsx       # 数据管理子页面
+│   │       ├── ListPage.tsx             # 列表页示例
+│   │       ├── DetailPage.tsx           # 详情页示例
+│   │       ├── LayoutGuidePage.tsx      # 布局说明
+│   │       └── ModalDemoPage.tsx        # 弹窗示例
 │   │
 │   ├── components/
 │   │   ├── common/               # 通用组件
@@ -477,13 +545,13 @@ export default {
 
 | 功能 | 参考文件 |
 |------|---------|
-| **如何做搜索筛选** | `src/pages/ListPage.tsx` → topBar |
-| **如何做 CRUD 操作** | `src/pages/ListPage.tsx` |
-| **如何做 Tabs 切换** | `src/pages/DetailPage.tsx` |
-| **如何做分页** | `src/pages/ListPage.tsx` |
+| **如何做搜索筛选** | `src/pages/module/ListPage.tsx` → topBar |
+| **如何做 CRUD 操作** | `src/pages/module/ListPage.tsx` |
+| **如何做 Tabs 切换** | `src/pages/module/DetailPage.tsx` |
+| **如何做分页** | `src/pages/module/ListPage.tsx` |
 | **如何做侧边栏折叠** | `src/layout/MainLayout.tsx` 或 `PageLayout.tsx` |
 | **如何做响应式布局** | `src/hooks/useMediaQuery.ts` |
-| **如何做弹窗** | `src/pages/ModalDemoPage.tsx` |
+| **如何做弹窗** | `src/pages/module/ModalDemoPage.tsx` |
 | **如何做加载/空状态** | `src/components/common/` |
 
 ---
@@ -495,13 +563,13 @@ export default {
 ### 有效的提示示例
 
 ```
-"参考 src/pages/ListPage.tsx，创建一个用户管理页面，
+"参考 src/pages/module/ListPage.tsx，创建一个用户管理页面，
 包含搜索框、表格、编辑弹窗，使用 PageLayout 布局，
 颜色和间距使用 designSystem"
 ```
 
 ```
-"参考 src/pages/DetailPage.tsx，创建一个产品详情页，
+"参考 src/pages/module/DetailPage.tsx，创建一个产品详情页，
 使用 Tabs 展示基本信息和规格参数，
 使用 designSystem.spacing[1] 作为 contentPadding"
 ```
@@ -532,12 +600,12 @@ export default {
 **新手入门：**
 1. 阅读 [DESIGN-GUIDELINES.md](./DESIGN-GUIDELINES.md) 了解设计系统
 2. 运行 `npm run dev`，查看 "布局说明" 页面
-3. 参考 `src/pages/ListPage.tsx` 创建第一个页面
+3. 参考 `src/pages/module/ListPage.tsx` 创建第一个页面
 
 **进阶开发：**
 1. 阅读 [MIGRATION-GUIDE.md](./MIGRATION-GUIDE.md) 学习最佳实践
 2. 研究 `src/styles/DesignSystem.ts` 理解设计规范
-3. 参考 `src/pages/ModalDemoPage.tsx` 学习弹窗布局
+3. 参考 `src/pages/module/ModalDemoPage.tsx` 学习弹窗布局
 
 **专家级：**
 1. 自定义 `src/styles/DesignSystem.ts` 中的 token

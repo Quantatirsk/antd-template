@@ -10,9 +10,8 @@
  */
 
 import { useState, useMemo } from 'react';
-import { Input, Select, Button, Table, Card, Tag, Space, Modal, Form, message, Radio, Checkbox } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined, ExportOutlined, AppstoreOutlined, UnorderedListOutlined } from '@ant-design/icons';
-import PageLayout from '@/layout/PageLayout';
+import { Input, Select, Button, Table, Card, Tag, Space, Modal, Form, message, Radio, Statistic } from 'antd';
+import { PlusOutlined, EditOutlined, DeleteOutlined, ExportOutlined, AppstoreOutlined, UnorderedListOutlined, CheckCircleOutlined, FileTextOutlined, InboxOutlined } from '@ant-design/icons';
 import { LoadingState, EmptyState } from '@/components/common';
 import { designSystem } from '@/styles';
 import type { ColumnsType } from 'antd/es/table';
@@ -45,6 +44,75 @@ const mockData: DataItem[] = Array.from({ length: 500 }, (_, i) => ({
   edgeCount: Math.floor(Math.random() * 50000),
 }));
 
+// ==================== 右侧栏组件（导出供容器页使用）====================
+
+export function ListPageSidebar({ data, selectedItem }: { data: DataItem[]; selectedItem: DataItem | null }) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: designSystem.spacing[2] }}>
+      {/* 统计卡片 */}
+      <Card size="small" style={{ borderRadius: designSystem.borderRadius.lg }}>
+        <Statistic
+          title="总数"
+          value={data.length}
+          prefix={<FileTextOutlined />}
+        />
+      </Card>
+      <Card size="small" style={{ borderRadius: designSystem.borderRadius.lg }}>
+        <Statistic
+          title="活跃"
+          value={data.filter(d => d.status === 'active').length}
+          prefix={<CheckCircleOutlined />}
+          valueStyle={{ color: designSystem.colors.success }}
+        />
+      </Card>
+      <Card size="small" style={{ borderRadius: designSystem.borderRadius.lg }}>
+        <Statistic
+          title="归档"
+          value={data.filter(d => d.status === 'archived').length}
+          prefix={<InboxOutlined />}
+        />
+      </Card>
+
+      {/* 选中项详情 */}
+      {selectedItem ? (
+        <>
+          <Card size="small" title="详情" style={{ borderRadius: designSystem.borderRadius.lg }}>
+            <div style={{ fontSize: designSystem.typography.fontSize.xs }}>
+              <div style={{ marginBottom: designSystem.spacing[1] }}>
+                <div style={{ color: designSystem.semantic.text.secondary, marginBottom: designSystem.spacing[0.25] }}>名称:</div>
+                <div style={{ color: designSystem.semantic.text.primary }}>{selectedItem.name}</div>
+              </div>
+              <div style={{ marginBottom: designSystem.spacing[1] }}>
+                <div style={{ color: designSystem.semantic.text.secondary, marginBottom: designSystem.spacing[0.25] }}>状态:</div>
+                <div><Tag color={selectedItem.status === 'active' ? 'green' : 'gray'}>{selectedItem.status}</Tag></div>
+              </div>
+              <div style={{ marginBottom: designSystem.spacing[1] }}>
+                <div style={{ color: designSystem.semantic.text.secondary, marginBottom: designSystem.spacing[0.25] }}>节点数:</div>
+                <div style={{ color: designSystem.semantic.text.primary }}>{selectedItem.nodeCount?.toLocaleString()}</div>
+              </div>
+              <div>
+                <div style={{ color: designSystem.semantic.text.secondary, marginBottom: designSystem.spacing[0.25] }}>边数:</div>
+                <div style={{ color: designSystem.semantic.text.primary }}>{selectedItem.edgeCount?.toLocaleString()}</div>
+              </div>
+            </div>
+          </Card>
+          <Card size="small" title="操作" style={{ borderRadius: designSystem.borderRadius.lg }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: designSystem.spacing[2] }}>
+              <Button size="small" block>编辑</Button>
+              <Button size="small" block>查看详情</Button>
+              <Button size="small" block danger>删除</Button>
+            </div>
+          </Card>
+        </>
+      ) : (
+        <div style={{ textAlign: 'center', padding: designSystem.spacing[6], color: designSystem.semantic.text.tertiary }}>
+          点击列表项查看详情
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ==================== 主组件 ====================
 
 export default function ListPage() {
@@ -57,14 +125,11 @@ export default function ListPage() {
   // 筛选条件
   const [searchText, setSearchText] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
-  const [typeFilter, setTypeFilter] = useState<string[]>([]);
 
   // UI 状态
   const [viewMode, setViewMode] = useState<'card' | 'table'>('table');
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
-  const [leftCollapsed, setLeftCollapsed] = useState(false);
-  const [rightCollapsed, setRightCollapsed] = useState(false);
 
   // 分页
   const [currentPage, setCurrentPage] = useState(1);
@@ -81,12 +146,9 @@ export default function ListPage() {
       // 状态筛选
       const matchStatus = statusFilter === 'all' || item.status === statusFilter;
 
-      // 类型筛选
-      const matchType = typeFilter.length === 0 || typeFilter.includes(item.type);
-
-      return matchSearch && matchStatus && matchType;
+      return matchSearch && matchStatus;
     });
-  }, [data, searchText, statusFilter, typeFilter]);
+  }, [data, searchText, statusFilter]);
 
   const paginatedData = useMemo(() => {
     const start = (currentPage - 1) * pageSize;
@@ -312,214 +374,100 @@ export default function ListPage() {
     </div>
   );
 
-  // 左侧筛选面板
-  const leftSidebar = (
-    <>
-      {/* 类型筛选卡片 */}
-      <Card
-        size="small"
-        style={{
-          marginBottom: designSystem.spacing[1],  // 8px 最紧凑间距
-          borderRadius: designSystem.borderRadius.lg,
-        }}
-      >
-        <h3 style={{ fontSize: designSystem.typography.fontSize.sm, fontWeight: designSystem.typography.fontWeight.semibold, marginBottom: designSystem.spacing[1] }}>  {/* 8px */}
-          类型
-        </h3>
-        <Checkbox.Group
-          value={typeFilter}
-          onChange={setTypeFilter as any}
-          style={{ display: 'flex', flexDirection: 'column', gap: designSystem.spacing[1] }}
-        >
-          <Checkbox value="typeA" style={{ fontSize: designSystem.typography.fontSize.sm }}>
-            <span style={{ fontSize: designSystem.typography.fontSize.sm }}>类型 A</span>
-          </Checkbox>
-          <Checkbox value="typeB" style={{ fontSize: designSystem.typography.fontSize.sm }}>
-            <span style={{ fontSize: designSystem.typography.fontSize.sm }}>类型 B</span>
-          </Checkbox>
-          <Checkbox value="typeC" style={{ fontSize: designSystem.typography.fontSize.sm }}>
-            <span style={{ fontSize: designSystem.typography.fontSize.sm }}>类型 C</span>
-          </Checkbox>
-        </Checkbox.Group>
-      </Card>
-
-      {/* 统计信息卡片 */}
-      <Card
-        size="small"
-        style={{
-          borderRadius: designSystem.borderRadius.lg,
-        }}
-      >
-        <h3 style={{ fontSize: designSystem.typography.fontSize.sm, fontWeight: designSystem.typography.fontWeight.semibold, marginBottom: designSystem.spacing[1] }}>  {/* 8px */}
-          统计
-        </h3>
-        <div style={{ fontSize: designSystem.typography.fontSize.sm, color: designSystem.semantic.text.secondary }}>  {/* 统一字体13px */}
-          <div style={{ marginBottom: designSystem.spacing[1] }}>总数: {data.length}</div>
-          <div style={{ marginBottom: designSystem.spacing[1] }}>活跃: {data.filter(d => d.status === 'active').length}</div>
-          <div style={{ marginBottom: designSystem.spacing[1] }}>归档: {data.filter(d => d.status === 'archived').length}</div>
-          <div>草稿: {data.filter(d => d.status === 'draft').length}</div>
-        </div>
-      </Card>
-    </>
-  );
-
-  // 右侧详情面板
-  const rightSidebar = (
-    <>
-      {selectedItem ? (
-        <>
-          <Card size="small" title="详情" style={{ marginBottom: designSystem.spacing[1], borderRadius: designSystem.borderRadius.lg }}>  {/* 8px */}
-            <div style={{ fontSize: designSystem.typography.fontSize.xs }}>
-              <div style={{ marginBottom: designSystem.spacing[1] }}>  {/* 8px */}
-                <div style={{ color: designSystem.semantic.text.secondary, marginBottom: designSystem.spacing[0.25] }}>名称:</div>
-                <div style={{ color: designSystem.semantic.text.primary }}>{selectedItem.name}</div>
-              </div>
-              <div style={{ marginBottom: designSystem.spacing[1] }}>  {/* 8px */}
-                <div style={{ color: designSystem.semantic.text.secondary, marginBottom: designSystem.spacing[0.25] }}>描述:</div>
-                <div style={{ color: designSystem.semantic.text.primary }}>{selectedItem.description}</div>
-              </div>
-              <div style={{ marginBottom: designSystem.spacing[1] }}>  {/* 8px */}
-                <div style={{ color: designSystem.semantic.text.secondary, marginBottom: designSystem.spacing[0.25] }}>状态:</div>
-                <div><Tag color={selectedItem.status === 'active' ? 'green' : 'gray'}>{selectedItem.status}</Tag></div>
-              </div>
-              <div style={{ marginBottom: designSystem.spacing[1] }}>  {/* 8px */}
-                <div style={{ color: designSystem.semantic.text.secondary, marginBottom: designSystem.spacing[0.25] }}>节点数:</div>
-                <div style={{ color: designSystem.semantic.text.primary }}>{selectedItem.nodeCount?.toLocaleString()}</div>
-              </div>
-              <div style={{ marginBottom: designSystem.spacing[1] }}>  {/* 8px */}
-                <div style={{ color: designSystem.semantic.text.secondary, marginBottom: designSystem.spacing[0.25] }}>边数:</div>
-                <div style={{ color: designSystem.semantic.text.primary }}>{selectedItem.edgeCount?.toLocaleString()}</div>
-              </div>
-              <div>
-                <div style={{ color: designSystem.semantic.text.secondary, marginBottom: designSystem.spacing[0.25] }}>创建时间:</div>
-                <div style={{ color: designSystem.semantic.text.primary }}>{new Date(selectedItem.createdAt).toLocaleString('zh-CN')}</div>
-              </div>
-            </div>
-          </Card>
-
-          <Card size="small" title="操作" style={{ borderRadius: designSystem.borderRadius.lg }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: designSystem.spacing[2] }}>
-              <Button size="small" block onClick={() => handleEdit(selectedItem)}>编辑</Button>
-              <Button size="small" block onClick={() => console.log('查看详情:', selectedItem.id)}>查看详情</Button>
-              <Button size="small" block danger onClick={() => handleDelete(selectedItem)}>删除</Button>
-            </div>
-          </Card>
-        </>
-      ) : (
-        <div style={{ textAlign: 'center', padding: designSystem.spacing[6], color: designSystem.semantic.text.tertiary }}>
-          点击列表项查看详情
-        </div>
-      )}
-    </>
-  );
-
-  // 底部状态栏
-  const bottomBar = (
-    <>
-      <span>总数: {filteredData.length}</span>
-      <span>选中: {selectedKeys.length}</span>
-      <span>页码: {currentPage}/{Math.ceil(filteredData.length / pageSize)}</span>
-    </>
-  );
-
   // ==================== 渲染 ====================
   return (
-    <>
-      <PageLayout
-        topBar={topBar}
-        leftSidebar={leftSidebar}
-        leftDefaultCollapsed={leftCollapsed}
-        onLeftCollapsedChange={setLeftCollapsed}
-        rightSidebar={rightSidebar}
-        rightDefaultCollapsed={rightCollapsed}
-        onRightCollapsedChange={setRightCollapsed}
-        bottomBar={bottomBar}
-      >
+    <div style={{
+      height: '100%',
+      display: 'flex',
+      flexDirection: 'column',
+      gap: designSystem.spacing[1],
+    }}>
+      {/* 顶部工具栏 - 原 topBar */}
+      <Card size="small" style={{ borderRadius: designSystem.borderRadius.lg }}>
+        {topBar}
+      </Card>
+
+      {/* 主内容区 */}
+      {loading ? (
+        <Card size="small" style={{ flex: 1, borderRadius: designSystem.borderRadius.lg }}>
+          <LoadingState mode="skeleton" rows={8} />
+        </Card>
+      ) : filteredData.length === 0 ? (
+        <Card size="small" style={{ flex: 1, borderRadius: designSystem.borderRadius.lg }}>
+          <EmptyState
+            type="general"
+            description="暂无数据"
+            action={{ text: '新建', onClick: () => setCreateModalOpen(true) }}
+          />
+        </Card>
+      ) : viewMode === 'table' ? (
+        <Card
+          size="small"
+          style={{
+            borderRadius: designSystem.borderRadius.lg,
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            minHeight: 0,
+          }}
+          styles={{ body: { padding: parseInt(designSystem.spacing[1]), flex: 1, overflow: 'hidden' } }}
+        >
+          <Table
+            size="small"
+            rowKey="id"
+            columns={columns}
+            dataSource={paginatedData}
+            pagination={{
+              current: currentPage,
+              pageSize,
+              total: filteredData.length,
+              onChange: setCurrentPage,
+              showSizeChanger: true,
+              pageSizeOptions: ['20', '50', '100', '200'],
+              showTotal: (total) => `共 ${total} 条`,
+              size: 'small',
+            }}
+            rowSelection={{
+              selectedRowKeys: selectedKeys,
+              onChange: setSelectedKeys as any,
+              columnWidth: designSystem.tableColumnWidths.checkbox,
+            }}
+            scroll={{ x: 1000, y: 'calc(100vh - 306px)' }}
+          />
+        </Card>
+      ) : (
         <div style={{
+          display: 'grid',
+          gridTemplateColumns: `repeat(auto-fill, minmax(${designSystem.cardSystem.minWidth}, 1fr))`,
+          gap: designSystem.spacing[1],
           flex: 1,
-          display: 'flex',
-          flexDirection: 'column',
+          overflow: 'auto',
           minHeight: 0,
-          background: designSystem.semantic.surface.base,
+          padding: designSystem.spacing[1],
         }}>
-          {loading ? (
-            <LoadingState mode="skeleton" rows={8} />
-          ) : filteredData.length === 0 ? (
-            <EmptyState
-              type="general"
-              description="暂无数据"
-              action={{ text: '新建', onClick: () => setCreateModalOpen(true) }}
-            />
-          ) : viewMode === 'table' ? (
+          {paginatedData.map(item => (
             <Card
-              style={{
-                borderRadius: designSystem.tableSystem.containerBorderRadius,
-                flex: 1,
-                display: 'flex',
-                flexDirection: 'column',
-                margin: designSystem.spacing[1],  // 8px - 与左侧边栏对齐，防止阴影裁剪
-                minHeight: 0,
-              }}
-              styles={{ body: { padding: parseInt(designSystem.spacing[1]), flex: 1, overflow: 'hidden' } }}
+              key={item.id}
+              size="small"
+              title={item.name}
+              extra={<Tag color={item.status === 'active' ? 'green' : 'gray'}>{item.status}</Tag>}
+              onClick={() => setSelectedItem(item)}
+              style={{ cursor: 'pointer' }}
+              actions={[
+                <EditOutlined key="edit" onClick={(e) => { e.stopPropagation(); handleEdit(item); }} />,
+                <DeleteOutlined key="delete" onClick={(e) => { e.stopPropagation(); handleDelete(item); }} />,
+              ]}
             >
-              <Table
-                size="small"
-                rowKey="id"
-                columns={columns}
-                dataSource={paginatedData}
-                pagination={{
-                  current: currentPage,
-                  pageSize,
-                  total: filteredData.length,
-                  onChange: setCurrentPage,
-                  showSizeChanger: true,
-                  pageSizeOptions: ['20', '50', '100', '200'],
-                  showTotal: (total) => `共 ${total} 条`,
-                  size: 'small',
-                }}
-                rowSelection={{
-                  selectedRowKeys: selectedKeys,
-                  onChange: setSelectedKeys as any,
-                  columnWidth: designSystem.tableColumnWidths.checkbox,
-                }}
-                scroll={{ x: 1000, y: 'calc(100vh - 306px)' }}  // 自适应高度: Header(56) + topBar(56) + 表头(32) + 分页器(40) + 底部栏(28) + 间隙(34) + Card margin(16) + padding(44) = 306px
-              />
+              <div style={{ fontSize: designSystem.typography.fontSize.sm, color: designSystem.semantic.text.secondary, marginBottom: designSystem.spacing[1] }}>
+                {item.description}
+              </div>
+              <div style={{ fontSize: designSystem.typography.fontSize.xs, color: designSystem.semantic.text.tertiary }}>
+                节点: {item.nodeCount?.toLocaleString()} | 边: {item.edgeCount?.toLocaleString()}
+              </div>
             </Card>
-          ) : (
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: `repeat(auto-fill, minmax(${designSystem.cardSystem.minWidth}, 1fr))`,
-              gap: designSystem.spacing[1],  // 8px
-              flex: 1,
-              overflow: 'auto',
-              minHeight: 0,
-              padding: designSystem.spacing[1],  // 8px - 防止卡片阴影被裁剪
-            }}>
-              {paginatedData.map(item => (
-                <Card
-                  key={item.id}
-                  size="small"
-                  title={item.name}
-                  extra={<Tag color={item.status === 'active' ? 'green' : 'gray'}>{item.status}</Tag>}
-                  onClick={() => setSelectedItem(item)}
-                  style={{ cursor: 'pointer' }}
-                  actions={[
-                    <EditOutlined key="edit" onClick={(e) => { e.stopPropagation(); handleEdit(item); }} />,
-                    <DeleteOutlined key="delete" onClick={(e) => { e.stopPropagation(); handleDelete(item); }} />,
-                  ]}
-                >
-                  <div style={{ fontSize: designSystem.typography.fontSize.sm, color: designSystem.semantic.text.secondary, marginBottom: designSystem.spacing[1] }}>  {/* 8px */}
-                    {item.description}
-                  </div>
-                  <div style={{ fontSize: designSystem.typography.fontSize.xs, color: designSystem.semantic.text.tertiary }}>
-                    节点: {item.nodeCount?.toLocaleString()} | 边: {item.edgeCount?.toLocaleString()}
-                  </div>
-                </Card>
-              ))}
-            </div>
-          )}
+          ))}
         </div>
-      </PageLayout>
+      )}
 
       {/* 创建 Modal */}
       <Modal
@@ -580,6 +528,6 @@ export default function ListPage() {
           </Form.Item>
         </Form>
       </Modal>
-    </>
+    </div>
   );
 }
