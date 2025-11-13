@@ -114,9 +114,6 @@ designSystem.semantic.surface.background // 页面背景
 
 designSystem.semantic.border.light       // 浅色边框
 designSystem.semantic.border.medium      // 标准边框
-
-// ❌ 不推荐
-designSystem.colors.neutral[900]
 ```
 
 ---
@@ -391,23 +388,161 @@ designSystem.borderRadius.full  // '9999px' - 完全圆形
 **内边距规范：**
 - TopBar：`8px`
 - 侧边栏：`8px`
-- MainContent：由页面自行控制（默认无 padding）
+- MainContent：**由 PageLayout 的 `contentPadding` prop 统一控制**
 - BottomBar：`8px`
 
-**何时使用 contentPadding？**
+### 页面开发规范（重要）
+
+**核心原则：使用 `contentPadding` prop，不在页面内部添加 padding**
+
+#### 正确做法
+
+**方案 1：在布局层设置 contentPadding（推荐）**
 ```tsx
-// ✅ 详情页（需要内边距）
+// 布局层
 <PageLayout contentPadding={designSystem.spacing[1]}>
-  <Descriptions />
+  <MyPage />
 </PageLayout>
 
-// ✅ 列表页（不需要内边距，Card 自带 padding）
-<PageLayout>
-  <Card>
-    <Table />
-  </Card>
-</PageLayout>
+// 页面组件 - 直接返回内容
+export default function MyPage() {
+  return (
+    <div style={{
+      height: '100%',
+      display: 'flex',
+      flexDirection: 'column',
+      gap: designSystem.spacing[1],
+    }}>
+      <Card>内容 1</Card>
+      <Card>内容 2</Card>
+    </div>
+  );
+}
 ```
+
+**方案 2：Card 自带 margin（表格场景）**
+```tsx
+// 布局层 - 无 contentPadding
+<PageLayout>
+  <MyPage />
+</PageLayout>
+
+// 页面组件
+export default function MyPage() {
+  return (
+    <div style={{ height: '100%', overflow: 'auto' }}>
+      <Card style={{ margin: designSystem.spacing[1] }}>
+        <Table />
+      </Card>
+    </div>
+  );
+}
+```
+
+#### 何时使用 contentPadding？
+
+| 场景 | contentPadding | 说明 |
+|------|----------------|------|
+| **简单内容页** | `spacing[1]` (8px) | 直接渲染文本、表单、描述等 |
+| **卡片列表页** | `spacing[1]` (8px) | 多个 Card 垂直排列，使用 gap 间隔 |
+| **表格页** | **不使用** | Card 自带 `margin: 8px` |
+| **全屏图表页** | **不使用** | 图表组件自带边距 |
+| **复杂布局页** | `spacing[1]` (8px) | 使用 flex/grid 布局 |
+
+#### 完整示例
+
+```tsx
+// ComparisonSystemPage.tsx - 布局层统一控制
+<PageLayout contentPadding={designSystem.spacing[1]}>
+  <Outlet />
+</PageLayout>
+
+// ProjectManagementPage.tsx - 页面组件
+export default function ProjectManagementPage() {
+  return (
+    <div style={{
+      height: '100%',
+      display: 'flex',
+      flexDirection: 'column',
+      gap: designSystem.spacing[1],
+    }}>
+      <Card>...</Card>
+      <Card>...</Card>
+    </div>
+  );
+}
+```
+
+#### 检查清单
+
+开发页面时，请确保：
+- [ ] **不在页面组件内部添加外层 padding div**
+- [ ] 在布局层使用 `contentPadding` prop 控制间距
+- [ ] Card 之间使用 `gap: spacing[1]` (8px) 间隔
+- [ ] 表格场景下 Card 使用 `margin: spacing[1]` (8px)
+- [ ] 所有间距基于 8px 网格系统
+
+---
+
+### Flex 布局高度控制（易错点⚠️）
+
+**核心问题：**PageLayout 中使用 flex 嵌套时，Card 内容溢出无法滚动。
+
+**根本原因：**Flex 子元素默认 `min-height: auto`，内容会撑开容器，破坏滚动。
+
+#### 核心规则
+
+> **在 flex 嵌套层级中，需要滚动的每一层都必须加 `minHeight: 0`**
+
+**记忆三原则：**
+1. **父是 flex？**子用 `flex: 1`（不是 `height: 100%`）
+2. **要滚动？**每层加 `minHeight: 0`
+3. **最内层？**加 `overflow: 'auto'`
+
+#### 正确实现
+
+```tsx
+// 每层都加 minHeight: 0
+<div style={{ flex: 1, minHeight: 0, display: 'flex' }}>
+  <div style={{ flex: 1, minHeight: 0 }}>
+    <Card
+      style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}
+      styles={{ body: { flex: 1, overflow: 'auto', minHeight: 0 } }}
+    >
+      {content}
+    </Card>
+  </div>
+</div>
+```
+
+#### 常用模板
+
+**左右双栏：**
+```tsx
+<div style={{ flex: 1, minHeight: 0, display: 'flex', gap: 8 }}>
+  <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
+    <Card style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}
+          styles={{ body: { flex: 1, overflow: 'auto', minHeight: 0 } }}>
+      {content}
+    </Card>
+  </div>
+</div>
+```
+
+**垂直分栏：**
+```tsx
+<div style={{ height: '100%', display: 'flex', flexDirection: 'column', gap: 8 }}>
+  <Card>固定顶部</Card>
+  <div style={{ flex: 1, overflow: 'hidden' }}>{scrollableContent}</div>
+</div>
+```
+
+**调试检查清单：**
+- [ ] 每个 flex 嵌套层都有 `minHeight: 0`
+- [ ] 父容器用 `flex: 1` 而非 `height: 100%`
+- [ ] `overflow: auto` 在正确层级（通常是 Card body）
+
+**参考：**`src/pages/comparison/ReportCenterPage.tsx`
 
 ### DisplayLayout（全屏展示布局）
 
@@ -453,102 +588,37 @@ interface DisplayLayoutProps {
 }
 ```
 
-**使用场景：**
+**基本用法：**
 ```tsx
 import DisplayLayout from '@/layout/DisplayLayout';
 
-// ✅ 大屏数据展示
-<DisplayLayout
-  topBar={<TopActions />}
-  contentPadding={designSystem.spacing[3]}
-  backgroundColor={designSystem.semantic.surface.background}
->
-  <DashboardCharts />
-</DisplayLayout>
-
-// ✅ 数据可视化全屏
+// 最简用法 - 纯内容全屏
 <DisplayLayout>
   <DataVisualization />
 </DisplayLayout>
 
-// ✅ 演示/投影模式
+// 带顶部操作栏
 <DisplayLayout
-  topBar={
-    <Space>
-      <Button icon={<CloseOutlined />}>退出</Button>
-      <Button icon={<FullscreenOutlined />}>全屏</Button>
-    </Space>
-  }
+  topBar={<Space><Button>退出</Button><Button>全屏</Button></Space>}
+  contentPadding={designSystem.spacing[3]}
 >
-  <PresentationContent />
+  <DashboardCharts />
 </DisplayLayout>
 ```
 
-**何时使用：**
-- ✅ 大屏展示模式（会议室大屏、演示投影）
-- ✅ 数据可视化看板（纯展示场景）
-- ✅ 数据图表全屏查看
-- ✅ 报表打印预览
-- ❌ 需要侧边栏导航的工作台（使用 PageLayout）
-- ❌ 需要复杂交互的管理页面（使用 PageLayout）
+**适用场景：**
+- ✅ 大屏展示、数据可视化、演示投影
+- ❌ 需要侧边栏导航（使用 PageLayout）
 
 **与 PageLayout 对比：**
 | 特性 | PageLayout | DisplayLayout |
 |------|------------|---------------|
-| 用途 | 工作台/管理页面 | 全屏展示/大屏 |
-| 侧边栏 | 支持左右侧边栏 | 无侧边栏 |
-| 底部栏 | 支持 | 无 |
+| 用途 | 工作台/管理 | 全屏展示 |
+| 侧边栏 | 支持左右侧边栏 | 无 |
 | 默认 padding | 由页面控制 | 默认 0 |
-| 响应式 | 复杂（三栏折叠） | 简单（纯内容） |
-| 最佳场景 | 数据管理、表单编辑 | 数据展示、可视化 |
+| 最佳场景 | 数据管理 | 数据展示 |
 
-**实战示例 - Dashboard 大屏模式：**
-```tsx
-export default function DashboardPage() {
-  const topBar = (
-    <div style={{ display: 'flex', gap: designSystem.spacing[2], width: '100%' }}>
-      {/* 左侧：时间筛选 */}
-      <Space>
-        <Select value={timePeriod} onChange={setTimePeriod} />
-        <DatePicker.RangePicker />
-      </Space>
-
-      {/* 中间：系统状态指示器 */}
-      <div style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
-        <Tooltip title="CPU 使用率">
-          <Progress type="circle" percent={45} size={32} />
-        </Tooltip>
-        <Tooltip title="内存使用率">
-          <Progress type="circle" percent={72} size={32} />
-        </Tooltip>
-      </div>
-
-      {/* 右侧：操作按钮 */}
-      <Space>
-        <Button icon={<ReloadOutlined />}>刷新</Button>
-        <Button type="primary" icon={<PlusOutlined />}>创建</Button>
-      </Space>
-    </div>
-  );
-
-  return (
-    <DisplayLayout
-      topBar={topBar}
-      contentPadding={designSystem.spacing[3]}
-      backgroundColor={designSystem.semantic.surface.background}
-    >
-      {/* 统计卡片、图表、数据展示 */}
-      <DashboardContent />
-    </DisplayLayout>
-  );
-}
-```
-
-**设计原则：**
-- **最小化干扰**：移除所有非必要 UI 元素，专注内容展示
-- **充分利用空间**：全屏展示，适合投影和大屏设备
-- **可选顶部栏**：提供必要的操作入口（退出、刷新、筛选等）
-- **灵活配置**：支持自定义 padding 和背景色，适应不同场景
+**参考：**`src/pages/DashboardPage.tsx`
 
 ### ResponsiveGrid（响应式网格）
 
@@ -579,9 +649,9 @@ import { ResponsiveGrid } from '@/layout';
   - `xl`: ≥ 1200px（默认继承 lg）
 - `gutter`: 间距配置（默认 `[8, 8]`）
 
-**使用场景：**
+**基本用法：**
 ```tsx
-// ✅ 统计卡片网格
+// 统计卡片网格
 <ResponsiveGrid columns={{ xs: 1, sm: 2, lg: 4 }}>
   {stats.map(stat => (
     <Card key={stat.id}>
@@ -589,41 +659,15 @@ import { ResponsiveGrid } from '@/layout';
     </Card>
   ))}
 </ResponsiveGrid>
-
-// ✅ 产品卡片网格
-<ResponsiveGrid columns={{ xs: 1, sm: 2, md: 3 }}>
-  {products.map(product => (
-    <ProductCard key={product.id} {...product} />
-  ))}
-</ResponsiveGrid>
-
-// ✅ vs 直接使用 Row/Col（更简洁）
-// 传统方式
-<Row gutter={[16, 16]}>
-  {items.map(item => (
-    <Col xs={24} sm={12} md={8} lg={6} key={item.id}>
-      <Card>{item.content}</Card>
-    </Col>
-  ))}
-</Row>
-
-// ResponsiveGrid 方式
-<ResponsiveGrid columns={{ xs: 1, sm: 2, md: 3, lg: 4 }}>
-  {items.map(item => <Card key={item.id}>{item.content}</Card>)}
-</ResponsiveGrid>
 ```
 
-**何时使用：**
-- ✅ 需要快速创建响应式卡片网格
-- ✅ 列数规则统一且简单
-- ❌ 需要复杂的列宽控制（使用 Row/Col）
-- ❌ 需要不同项目占据不同列宽（使用 Row/Col）
+**适用场景：**
+- ✅ 快速创建响应式卡片网格，列数规则统一
+- ❌ 需要复杂列宽控制（使用 Row/Col）
 
 ---
 
 ## Ant Design Token 配置
-
-### 主题 Token
 
 在 `src/App.tsx` 中配置 ConfigProvider：
 
@@ -633,64 +677,15 @@ import { designSystem } from '@/styles';
 
 <ConfigProvider
   theme={{
-    token: {
-      // 颜色
-      colorPrimary: designSystem.colors.primary[500],
-      colorSuccess: designSystem.colors.success,
-      colorWarning: designSystem.colors.warning,
-      colorError: designSystem.colors.error,
-      colorInfo: designSystem.colors.info,
-
-      // 圆角
-      borderRadius: 8,
-      borderRadiusLG: 12,
-      borderRadiusSM: 4,
-
-      // 字号
-      fontSize: 16,
-      fontSizeSM: 14,
-      fontSizeLG: 18,
-      fontSizeXL: 20,
-
-      // 间距
-      margin: 16,
-      marginXS: 8,
-      marginSM: 12,
-      marginLG: 24,
-      marginXL: 32,
-
-      padding: 16,
-      paddingXS: 8,
-      paddingSM: 12,
-      paddingLG: 24,
-      paddingXL: 32,
-    },
-    components: {
-      // 组件级配置
-      Button: {
-        controlHeight: 40,
-        controlHeightSM: 32,
-        controlHeightLG: 48,
-      },
-      Input: {
-        controlHeight: 40,
-        controlHeightSM: 32,
-        controlHeightLG: 48,
-      },
-      Card: {
-        borderRadiusLG: 8,
-        paddingLG: 20,
-      },
-    },
+    token: designSystem.antdToken,
+    components: designSystem.components,
   }}
 >
   {/* 应用内容 */}
 </ConfigProvider>
 ```
 
-### 完整 Token 列表
-
-参考文件：`src/styles/DesignSystem.ts` 的 `antdToken` 和 `components` 配置。
+**Token 配置参考：**`src/styles/DesignSystem.ts`
 
 ---
 
@@ -742,45 +737,6 @@ import { designSystem } from '@/styles';
 ### 相关文档
 - [迁移指南](./MIGRATION-GUIDE.md)
 - [快速参考索引](./RefIndexing.md)
-
----
-
-## 常见错误
-
-### ❌ 错误示例
-
-```tsx
-// 硬编码颜色
-<div style={{ color: '#1890ff' }}>文本</div>
-
-// 硬编码间距
-<div style={{ padding: '16px', margin: '20px' }}>内容</div>
-
-// 非 8px 网格
-<div style={{ height: '37px' }}>元素</div>
-```
-
-### ✅ 正确示例
-
-```tsx
-import { designSystem } from '@/styles';
-
-// 使用设计系统
-<div style={{
-  color: designSystem.colors.primary[500]
-}}>文本</div>
-
-// 使用标准间距
-<div style={{
-  padding: designSystem.spacing[4],  // 20px
-  margin: designSystem.spacing[5]    // 24px
-}}>内容</div>
-
-// 使用标准高度
-<div style={{
-  height: designSystem.heights.button  // 40px
-}}>元素</div>
-```
 
 ---
 

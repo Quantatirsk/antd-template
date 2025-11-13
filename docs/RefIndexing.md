@@ -492,7 +492,7 @@ export default {
 
 在使用 AI 辅助编码时，可以这样描述：
 
-### ✅ 好的提示
+### 有效的提示示例
 
 ```
 "参考 src/pages/ListPage.tsx，创建一个用户管理页面，
@@ -515,20 +515,6 @@ export default {
 "参考 src/pages/DashboardPage.tsx，创建一个数据大屏页面，
 使用 DisplayLayout 全屏展示，包含系统状态、统计卡片和图表，
 使用 designSystem.spacing[3] 作为 contentPadding"
-```
-
-### ❌ 不好的提示
-
-```
-"创建一个列表页"  // 太模糊，没有指定参考
-```
-
-```
-"用蓝色做主题"  // 应该使用 designSystem.colors.primary[500]
-```
-
-```
-"padding 用 20px"  // 应该使用 designSystem.spacing[4]
 ```
 
 ---
