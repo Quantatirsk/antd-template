@@ -1,7 +1,7 @@
 /**
  * 布局说明页 - Layout Guide Page
  *
- * 说明：本页面用于展示 MainLayout 和 PageLayout 的结构
+ * 说明：本页面用于展示 MainLayout、PageLayout 和 DisplayLayout 的结构
  * 注意：所有颜色值均为硬编码，仅用于演示布局区域，不代表设计系统规范
  */
 
@@ -26,6 +26,10 @@ const DEMO_COLORS = {
     mainContent: 'rgba(14, 165, 233, 0.15)', // 天蓝色 - 主内容区
     rightSidebar: 'rgba(168, 85, 247, 0.15)', // 紫罗兰 - 右侧边栏
     bottomBar: 'rgba(245, 158, 11, 0.15)',   // 琥珀色 - 底部状态栏
+  },
+  displayLayout: {
+    topBar: 'rgba(99, 102, 241, 0.15)',     // 靛蓝 - 顶部操作栏
+    mainContent: 'rgba(16, 185, 129, 0.15)', // 翠绿 - 全屏主内容区
   },
   border: {
     main: '#000',
@@ -77,6 +81,33 @@ const MAIN_LAYOUT_INFO: Record<string, AreaInfo> = {
       '使用 PageLayout 组织页面布局',
       'padding: 8px 为最紧凑布局',
       '高度自动计算：100vh - 56px',
+    ],
+  },
+};
+
+const DISPLAY_LAYOUT_INFO: Record<string, AreaInfo> = {
+  topBar: {
+    name: '顶部操作栏',
+    component: 'DisplayLayout > topBar',
+    description: '全屏展示模式的顶部操作区（可选）',
+    dimensions: '高度 56px（与 MainLayout.Header 一致）',
+    suggestions: [
+      '放置筛选控制、系统状态指示器',
+      '全屏/退出、刷新、导出等操作',
+      '简洁布局：左中右三段式',
+      '适合大屏投影、演示场景',
+    ],
+  },
+  mainContent: {
+    name: '全屏主内容区',
+    component: 'DisplayLayout > children',
+    description: '占满整个视口的内容展示区域',
+    dimensions: '高度：topBar 存在时为 calc(100vh - 56px)，否则 100vh',
+    suggestions: [
+      '适合数据可视化、图表展示',
+      '大屏展示、会议室投影',
+      '默认无 padding，充分利用空间',
+      '可配置 contentPadding 和 backgroundColor',
     ],
   },
 };
@@ -295,6 +326,42 @@ export default function LayoutGuidePage() {
     </Card>
   );
 
+  /* ==================== DisplayLayout 示意图 ==================== */
+  // 全屏布局：无侧边栏，只有可选的顶部操作栏和主内容区
+  const displayLayoutDemo = (
+    <Card
+      title="DisplayLayout 结构（全屏展示模式，用于大屏/数据可视化）"
+      size="small"
+      style={{ marginBottom: designSystem.spacing[3] }}
+    >
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: designSystem.spacing[2],
+        minHeight: '400px',
+      }}>
+        {/* 顶部操作栏 - 56px（可选） */}
+        <div style={{ height: '56px', flexShrink: 0 }}>
+          <AreaCard
+            info={DISPLAY_LAYOUT_INFO.topBar}
+            color={DEMO_COLORS.displayLayout.topBar}
+            height="100%"
+            compact={true}
+          />
+        </div>
+
+        {/* 全屏主内容区 - 剩余高度 */}
+        <div style={{ flex: 1, minHeight: 0 }}>
+          <AreaCard
+            info={DISPLAY_LAYOUT_INFO.mainContent}
+            color={DEMO_COLORS.displayLayout.mainContent}
+            height="100%"
+          />
+        </div>
+      </div>
+    </Card>
+  );
+
   /* ==================== PageLayout 示意图 ==================== */
   // 按照实际比例：在 MainLayout.Content 内（约 1169px 宽度）
   // leftSidebar: 255px ≈ 21.8%, rightSidebar: 270px ≈ 23.1%
@@ -404,6 +471,16 @@ export default function LayoutGuidePage() {
             }} />
             <Text style={{ fontSize: designSystem.typography.fontSize.sm }}>PageLayout 区域</Text>
           </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: designSystem.spacing[1] }}>
+            <div style={{
+              width: '20px',
+              height: '20px',
+              backgroundColor: DEMO_COLORS.displayLayout.topBar,
+              border: `1px solid ${DEMO_COLORS.border.secondary}`,
+              borderRadius: designSystem.borderRadius.sm,
+            }} />
+            <Text style={{ fontSize: designSystem.typography.fontSize.sm }}>DisplayLayout 区域</Text>
+          </div>
         </div>
       </Card>
 
@@ -414,6 +491,9 @@ export default function LayoutGuidePage() {
           </Button>
           <Button type="text" block style={{ justifyContent: 'flex-start', fontSize: designSystem.typography.fontSize.sm }}>
             PageLayout 结构
+          </Button>
+          <Button type="text" block style={{ justifyContent: 'flex-start', fontSize: designSystem.typography.fontSize.sm }}>
+            DisplayLayout 结构
           </Button>
           <Button type="text" block style={{ justifyContent: 'flex-start', fontSize: designSystem.typography.fontSize.sm }}>
             使用示例
@@ -510,6 +590,7 @@ export default function LayoutGuidePage() {
             <div style={{ color: designSystem.semantic.text.secondary, marginTop: designSystem.spacing[0.5] }}>
               • MainLayout - 全局框架<br/>
               • PageLayout - 页面组织<br/>
+              • DisplayLayout - 全屏展示<br/>
               • ResponsiveGrid - 网格布局<br/>
               • StandardModalLayout<br/>
               • DrawerLayout<br/>
@@ -626,8 +707,9 @@ export default function LayoutGuidePage() {
       <Card size="small">
         <Title level={4} style={{ marginTop: 0 }}>布局系统说明</Title>
         <Paragraph>
-          本项目采用两层布局系统：<Text code>MainLayout</Text> 负责全局框架（导航+标题），
-          <Text code>PageLayout</Text> 负责页面内容组织（工具栏+侧边栏+内容）。
+          本项目采用多层布局系统：<Text code>MainLayout</Text> 负责全局框架（导航+标题），
+          <Text code>PageLayout</Text> 负责页面内容组织（工具栏+侧边栏+内容），
+          <Text code>DisplayLayout</Text> 负责全屏展示（大屏/数据可视化）。
         </Paragraph>
         <Paragraph style={{ marginBottom: 0 }}>
           <Text strong>注意：</Text>页面中的所有颜色为硬编码演示色，
@@ -638,15 +720,18 @@ export default function LayoutGuidePage() {
 
       {mainLayoutDemo}
       {pageLayoutDemo}
+      {displayLayoutDemo}
 
       {/* 使用示例 */}
       <Card title="使用示例" size="small">
+        <Title level={5} style={{ marginTop: 0 }}>PageLayout - 页面布局</Title>
         <pre style={{
           backgroundColor: designSystem.colors.neutral[50],
           padding: designSystem.spacing[3],
           borderRadius: designSystem.borderRadius.md,
           fontSize: designSystem.typography.fontSize.sm,
           overflow: 'auto',
+          marginBottom: designSystem.spacing[3],
         }}>
 {`import PageLayout from '@/layout/PageLayout';
 
@@ -668,6 +753,46 @@ export default function MyPage() {
       {/* 主内容区 */}
       <div>页面主要内容</div>
     </PageLayout>
+  );
+}`}
+        </pre>
+
+        <Title level={5}>DisplayLayout - 全屏展示</Title>
+        <pre style={{
+          backgroundColor: designSystem.colors.neutral[50],
+          padding: designSystem.spacing[3],
+          borderRadius: designSystem.borderRadius.md,
+          fontSize: designSystem.typography.fontSize.sm,
+          overflow: 'auto',
+        }}>
+{`import DisplayLayout from '@/layout/DisplayLayout';
+import { designSystem } from '@/styles';
+
+export default function MyDashboard() {
+  const topBar = (
+    <div style={{ display: 'flex', gap: designSystem.spacing[2] }}>
+      {/* 左侧：筛选 */}
+      <FilterControls />
+
+      {/* 中间：系统状态 */}
+      <div style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
+        <SystemStatus />
+      </div>
+
+      {/* 右侧：操作 */}
+      <ActionButtons />
+    </div>
+  );
+
+  return (
+    <DisplayLayout
+      topBar={topBar}
+      contentPadding={designSystem.spacing[3]}
+      backgroundColor={designSystem.semantic.surface.background}
+    >
+      {/* 全屏展示内容 */}
+      <div>统计卡片、图表、数据可视化...</div>
+    </DisplayLayout>
   );
 }`}
         </pre>
